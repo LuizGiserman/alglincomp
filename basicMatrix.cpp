@@ -9,9 +9,16 @@
 BasicMatrix::BasicMatrix (unsigned int n, unsigned int m) 
 {
 	
-	vector<vector<float>> matrix;
+	this->m = m;
+	this->n = n;
+
+}
+
+bool BasicMatrix::SetMatrix()
+{
+  vector<vector<double>> matrix;
 	string str;
-	if (m == 0 && n == 0)
+	if (this->m == 0)
 	{
     cout << "Enter the first dimension of the matrix\n";
     getline (cin, str);
@@ -21,7 +28,9 @@ BasicMatrix::BasicMatrix (unsigned int n, unsigned int m)
       exit(ERROR_BAD_INPUT);
     }
     stringstream(str) >> m;	
-
+  }
+  if(this->n == 0)
+  {
     cout << "Enter the second dimension of the matrix\n";
     getline (cin, str);
     if (!VerifyInput(str, false))
@@ -31,52 +40,31 @@ BasicMatrix::BasicMatrix (unsigned int n, unsigned int m)
     }
     stringstream(str) >> n;	
 	}
-
-	matrix.resize(m);
-	for (unsigned int row = 0; row < m; row++)
+	
+	matrix.resize(this->m);
+  for (unsigned int row = 0; row < m; row++)
 	{
 		for (unsigned int column = 0; column < n; column++)
 		{
-			matrix[row].resize(n);
-			cout << "enter element a["<< row + 1 << "][" << column + 1 << "]: "; 
+			matrix[row].resize(this->n);
+			cout << "enter element matrix["<< row + 1 << "][" << column + 1 << "]: "; 
 			getline (cin, str);
 			if (!VerifyInput(str, true, true))
 			{
-				cout << "Dimension must be of type double\n";
-				exit(ERROR_BAD_INPUT);
-			}
+				cout << "Element must be of type double\n";
+			  return false;
+      }
 			stringstream(str) >> matrix[row][column];
 		}
 	}
-	
-	this->m = m;
-	this->n = n;
-	this->matrix = matrix;
 
+  this->matrix = matrix;
+  this->m = m;
+  this->n = n;
+
+  return true;
 }
 
-bool BasicMatrix::VerifyInput(string str, bool canBeNegative, bool isDouble)
-{
-	for (auto const &x: str)
-	{
-		if ( x < '0' || x > '9')
-		{
-			if(!isDouble && !canBeNegative)
-			{
-				return false;
-			}
-			if (x != '.')
-			{
-				if (x != '-')
-				{
-					return false;
-				}
-			}
-		}
-	}
-
-	return true;
-}
 
 void BasicMatrix::PrintMatrix()
 {
@@ -91,3 +79,103 @@ void BasicMatrix::PrintMatrix()
 	cout << endl;
 }
 
+bool BasicMatrix::Allocate ()
+{
+  if (this-> m == 0 || this-> n == 0)
+  {
+    return false;
+  }
+  this->matrix.resize(this->m);
+  for (unsigned int counter = 0; counter < m; counter++)
+  {
+    this->matrix[counter].resize(this->n, 0);
+  }
+  return true;
+}
+
+bool BasicMatrix::Add(BasicMatrix matrixB)
+{
+  if (this->m != matrixB.m || this->n != matrixB.n)
+  {
+    return false;
+  }
+
+  for (unsigned int i = 0; i < matrixB.m; i++)
+  {
+    for (unsigned int j = 0; j < matrixB.n; j++)
+    {
+      this->matrix[i][j] += matrixB.matrix[i][j];
+    }
+  }
+
+  return true;
+}
+
+bool BasicMatrix::Add(BasicMatrix matrixB, BasicMatrix &result)
+{
+  if (this->m != matrixB.m || this->n != matrixB.n)
+  {
+    return false;
+  }
+
+  result.Allocate();
+  for (unsigned int i = 0; i < matrixB.m; i++)
+  {
+    for (unsigned int j = 0; j < matrixB.n; j++)
+    {
+      result.matrix[i][j] = this->matrix[i][j] + matrixB.matrix[i][j];
+    }
+  }
+
+  return true;
+
+}
+
+bool BasicMatrix::Cross(BasicMatrix &result, BasicMatrix matrixB)
+{
+  if (this->n != matrixB.m)
+  {
+    return false;
+  }
+  result.n = matrixB.n;
+  result.m = this->m;
+  result.Allocate();
+  for (unsigned int i = 0; i < this->m; i++)
+  {
+    for (unsigned int j = 0; j < matrixB.n; j++)
+    {
+      for (unsigned int k = 0; k < matrixB.m; k++)
+      {
+        result.matrix[i][j] += this->matrix[i][k] * matrixB.matrix[k][j];
+      }
+    }
+  }
+  return true;
+}
+
+bool BasicMatrix::Copy(BasicMatrix a)
+{
+  unsigned int i, j;
+  
+  if(a.m == 0 || a.n == 0)
+  {
+    return false;
+  }
+
+  if (this->m == 0 || this->n == 0)
+  {
+    this->m = a.m;
+    this->n = a.n;
+    this->Allocate();
+  }
+
+  for (i=0; i < a.m; i++)
+  {
+    for (j=0; j < a.n; j++)
+    {
+      this->matrix[i][j] = a.matrix[i][j];
+    }
+  }
+  
+  return true;
+}

@@ -18,14 +18,10 @@ int main ()
   a.Cross(result, b);
   result.PrintMatrix(); 
  */
-  LU teste;
-  if (!teste.Solve())
-  {
-    cout << "deu false\n";
-    return 1;
-  }
-  cout << "answer:\n";
-  teste.PrintSolution();
+  BasicMatrix a;
+  a.SetMatrix();
+  cout << "Determinant = " << a.Determinant(a) << endl;
+
   return 0;
 
 }

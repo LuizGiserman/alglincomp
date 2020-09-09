@@ -28,6 +28,12 @@ LinearEquation::LinearEquation()
   this->matrixB.n = 1;
   cout << "Regarding Matrix B:\n";
   this->matrixB.SetMatrix();
+  
+  if (this->matrixA.Determinant(this->matrixA) == 0)
+  {
+    cout << "No consistent solution to this problem\n";
+    exit(ERROR_NO_SOLUTION);
+  }
 
   this->numberVariables = numVar;
   solution.resize(this->numberVariables, 0);
@@ -76,7 +82,8 @@ bool LinearEquation::BackwardsSubstitution(BasicMatrix triangular, BasicMatrix b
     {
       auxiliar += triangular.matrix[i][j] * result.matrix[j][0];
     }
-    if (!triangular.matrix[i][j])
+
+    if (!triangular.matrix[i][i])
     {
       return false;
     }
@@ -207,4 +214,121 @@ void LU::MakeU (BasicMatrix &U)
       }
     }
   }
+}
+
+Cholesky::Cholesky()
+{
+  if (!matrixA.IsSymmetric())
+  {
+    cout << "Matrix must be symetric for cholesky's decomposition\n";
+    exit(ERROR_BAD_INPUT);
+  }
+  this->L.m = this->matrixA.m;
+  this->L.n = this->matrixA.n;
+  this->L.Allocate();
+  this->Decompose();
+}
+
+
+bool Cholesky::Decompose()
+{
+  unsigned int i, j, k;
+  double auxiliar = 0.0;
+  for (i=0; i < this->L.m; i++)
+  {
+    for (k=0; k < i; k++)
+    {
+      auxiliar += pow(L.matrix[i][k], 2);
+    }
+  
+    this->L.matrix[i][i] = sqrt(this->matrixA.matrix[i][i] - auxiliar);
+    auxiliar = 0;
+  
+    for (j=i+1; j < this->L.m; j++)
+    {
+      for (k=0; k < i; k++)
+      {
+        auxiliar += this->L.matrix[i][k] * this->L.matrix[j][k];
+      } 
+
+      L.matrix[j][i] = (this->matrixA.matrix[i][j] - auxiliar) / this->L.matrix[i][i];
+      auxiliar = 0.0;
+    }
+  }
+  
+  this->L.Transpose(this->LT);
+  return true;
+}
+
+bool Cholesky::Solve()
+{
+  return true;
+
+}
+
+Jacobi::Jacobi()
+{
+  string str;
+  cout << "Enter the Residual threshold: ";
+  getline (cin, str);
+  if (!VerifyInput(str, true, true))
+  {
+    cout << "Threshold has to be of type double\n";
+    exit(ERROR_BAD_INPUT);
+  }
+  stringstream(str) >> this->threshold;
+}
+
+bool Jacobi::Solve()
+{
+  unsigned int i, j;
+  unsigned int size = this->matrixA.m;
+  BasicMatrix x0, auxiliar;
+  double sum = 0;
+  double residue;
+
+  x0.m = size;
+  x0.n = 1;
+  x0.Allocate();
+  x0.Fill(1);
+  auxiliar.m = size;
+  auxiliar.n = 1; 
+  
+  do 
+  {
+    auxiliar.Clear();
+    auxiliar.Allocate();
+    
+    for (i=0; i < size; i++)
+    {
+      for (j=0; j < size; j++)
+      {
+        sum = this->matrixA.matrix[i][j] * x0.matrix[j][0];
+      }
+      if (this->matrixA.matrix[i][i] == 0)
+      {
+        return false;
+      }
+      auxiliar.matrix[i][0] = (this->matrixB.matrix[i][0] - sum)/this->matrixA.matrix[i][i];
+      sum = 0;
+    }
+    residue = this->Residue(auxiliar, x0);
+    x0 = auxiliar;
+  }
+  while (residue> this->threshold);
+
+  for (i = 0; i < size; i++)
+  {
+    this->solution[i] = x0.matrix[i][0];
+  }
+
+  x0.PrintMatrix();  
+  return true;
+}
+
+double Jacobi::Residue(BasicMatrix auxiliar, BasicMatrix x0)
+{
+  double normAuxiliar =  auxiliar.VectorNorm();
+  auxiliar.Subtract(x0);
+  return auxiliar.VectorNorm()/normAuxiliar;
 }

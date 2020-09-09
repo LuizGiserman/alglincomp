@@ -111,6 +111,41 @@ bool BasicMatrix::Add(BasicMatrix matrixB)
   return true;
 }
 
+bool BasicMatrix::Subtract(BasicMatrix matrixB)
+{
+  if (this->m != matrixB.m || this->n != matrixB.n)
+  {
+    return false;
+  }
+
+  for (unsigned int i = 0; i < matrixB.m; i++)
+  {
+    for (unsigned int j = 0; j < matrixB.n; j++)
+    {
+      this->matrix[i][j] -= matrixB.matrix[i][j];
+    }
+  }
+
+  return true;
+}
+
+
+bool BasicMatrix::Clear()
+{
+  unsigned int i, j;
+  if (this->matrix.empty())
+  {
+    return false;
+  }
+
+  for (i = 0; i < this->m; i++)
+  {
+      this->matrix[i].clear();
+  }
+  this->matrix.clear();
+  return true;
+}
+
 bool BasicMatrix::Add(BasicMatrix matrixB, BasicMatrix &result)
 {
   if (this->m != matrixB.m || this->n != matrixB.n)
@@ -130,6 +165,27 @@ bool BasicMatrix::Add(BasicMatrix matrixB, BasicMatrix &result)
   return true;
 
 }
+
+bool BasicMatrix::Subtract(BasicMatrix matrixB, BasicMatrix &result)
+{
+  if (this->m != matrixB.m || this->n != matrixB.n)
+  {
+    return false;
+  }
+
+  result.Allocate();
+  for (unsigned int i = 0; i < matrixB.m; i++)
+  {
+    for (unsigned int j = 0; j < matrixB.n; j++)
+    {
+      result.matrix[i][j] = this->matrix[i][j] - matrixB.matrix[i][j];
+    }
+  }
+
+  return true;
+
+}
+
 
 bool BasicMatrix::Cross(BasicMatrix &result, BasicMatrix matrixB)
 {
@@ -177,5 +233,138 @@ bool BasicMatrix::Copy(BasicMatrix a)
     }
   }
   
+  return true;
+}
+
+bool BasicMatrix::Transpose(BasicMatrix &result)
+{
+  unsigned int i, j;
+  result.m = this->m;
+  result.n = this->n;
+  result.Allocate();
+
+  for (i=0; i < result.m; i++)
+  {
+    for (j=0; j < result.n; j++)
+    {
+      result.matrix[i][j] = this->matrix[j][i];
+    }
+  }
+
+  return true;
+}
+
+double BasicMatrix::Determinant(BasicMatrix matrix)
+{
+  unsigned int i, j, k;
+  BasicMatrix newMatrix;
+  double result = 0.0;
+  
+  if (matrix.m == 1)
+  {
+    return matrix.matrix[0][0];
+  }
+
+  for (k=0; k < matrix.m; k++)
+  {
+    matrix.Reduce(k, newMatrix);
+    result += matrix.matrix[k][0] * pow(-1, k) * this->Determinant(newMatrix);
+  }
+
+  return result;
+
+}
+
+void BasicMatrix::Reduce(unsigned int index, BasicMatrix &result)
+{
+  
+  unsigned int i = 0, j =0;
+  unsigned int row, col;
+  
+  result.Clear();
+  result.m = this->m-1;
+  result.n = this->n-1;
+  result.Allocate();
+  
+  for (row=0; row < this->m; row++)
+  {
+    for (col=0; col < this->n; col++)
+    {
+
+      if (row != index && col != 0)
+      {
+        result.matrix[i][j] = this->matrix[row][col];
+        j++;
+        if(j = result.n-1)
+        {
+          j = 0;
+          i++;
+        }
+      }
+
+    }
+  }
+  
+
+}
+
+bool BasicMatrix::IsSymmetric()
+{
+  unsigned int i, j;
+  if (this->m != this-> n)
+  {
+    return false;
+  }
+
+  for (i=0; i < this->m; i++)
+  {
+    for (j=0; j < this->n; j++)
+    {
+      if(this->matrix[i][j] != this->matrix[j][i])
+      {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+double BasicMatrix::VectorNorm()
+{
+  double auxiliar = 0;
+  unsigned int i;
+  if(! (this->m == 1 || this->n ==1))
+  {
+    return -1;
+  }
+
+  /*considering normal vector where n=1*/
+
+  for (i=0; i < this->m; i++)
+  {
+    auxiliar += pow(this->matrix[i][0], 2);
+  }
+  auxiliar = sqrt(auxiliar);
+  
+  return auxiliar;
+}
+
+bool BasicMatrix::Fill(double value)
+{
+  unsigned int i, j;
+
+  if(this->m == 0 || this->n == 0)
+  {
+    return false;
+  }
+
+  for (i=0; i < this->m; i++)
+  {
+    for (j=0; j < this->n; j++)
+    {
+      this->matrix[i][j] = value;
+    }
+  }
   return true;
 }

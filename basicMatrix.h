@@ -11,6 +11,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <math.h>
 #include "utilities.h"
 
 #define ERROR_BAD_INPUT				1
@@ -28,9 +29,17 @@ class BasicMatrix : public Utilities
 	void PrintMatrix();
   bool Add(BasicMatrix matrixB);
   bool Add(BasicMatrix matrixB, BasicMatrix &result);
+  bool Subtract(BasicMatrix matrixB);
+  bool Subtract(BasicMatrix matrixB, BasicMatrix &result);
   bool Cross(BasicMatrix &result, BasicMatrix matrixB);
-	float ComputeDeterminant();
+	double Determinant(BasicMatrix m);
   bool Copy(BasicMatrix a);
+  bool Transpose(BasicMatrix &result);
+  bool Clear();
+  void Reduce(unsigned int index, BasicMatrix &result);
+  bool IsSymmetric();
+  double VectorNorm();
+  bool Fill(double value);
 };
 
 #endif

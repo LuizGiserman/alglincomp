@@ -7,7 +7,10 @@
 #ifndef LINEAR_EQUATION_H
 #define LINEAR_EQUATION_H
 
+#include <math.h>
 #include "basicMatrix.h"
+
+#define ERROR_NO_SOLUTION     2
 
 class LinearEquation : public Utilities
 {
@@ -28,7 +31,9 @@ class Jacobi : public LinearEquation
 {
   public:
     Jacobi();
+    double threshold;
     bool Solve();
+    double Residue(BasicMatrix auxiliar, BasicMatrix x0);
 };
 
 class GaussSeidel : public LinearEquation
@@ -54,6 +59,8 @@ class Cholesky : public LinearEquation
 {
   public:
     Cholesky();
+    BasicMatrix L, LT;
+    bool Decompose();
     bool Solve();
 };
 #endif

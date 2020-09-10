@@ -69,20 +69,19 @@ bool LinearEquation::ForwardSubstitution(BasicMatrix triangular, BasicMatrix b, 
 
 bool LinearEquation::BackwardsSubstitution(BasicMatrix triangular, BasicMatrix b, BasicMatrix &result)
 {
-  unsigned int i, j;
+  int i, j;
   double auxiliar = 0;
-  result.m = b.m;
+  result.m = triangular.m;
   result.n = 1;
   result.Allocate();
   result.matrix[0][0] = b.matrix[0][0]/triangular.matrix[0][0];
 
-  for (i = triangular.m-1; i >= 0; i++)
+  for (i = triangular.m-1; i >= 0; i--)
   {
-    for (j=i+1; j < triangular.m-1; j++)
+    for (j=i+1; j < triangular.m; j++)
     {
       auxiliar += triangular.matrix[i][j] * result.matrix[j][0];
     }
-
     if (!triangular.matrix[i][i])
     {
       return false;
@@ -90,11 +89,11 @@ bool LinearEquation::BackwardsSubstitution(BasicMatrix triangular, BasicMatrix b
 
     result.matrix[i][0] = (b.matrix[i][0] - auxiliar) / triangular.matrix[i][i];
     auxiliar = 0;
+    
   }
 
   return true;
 }
-
 
 bool LinearEquation::PrintSolution ()
 {

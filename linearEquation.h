@@ -8,6 +8,7 @@
 #define LINEAR_EQUATION_H
 
 #include <math.h>
+#include <string>
 #include "basicMatrix.h"
 
 #define ERROR_NO_SOLUTION     2
@@ -31,7 +32,7 @@ class Jacobi : public LinearEquation
 {
   public:
     Jacobi();
-    double threshold;
+    double threshold = 0.0;
     bool Solve();
     double Residue(BasicMatrix auxiliar, BasicMatrix x0);
 };

@@ -313,7 +313,10 @@ bool Jacobi::Solve()
       sum = 0;
     }
     residue = this->Residue(auxiliar, x0);
+    cout << "residue = " << residue << endl;
     x0 = auxiliar;
+    x0.PrintMatrix();
+    break;
   }
   while (residue> this->threshold);
 
@@ -329,6 +332,18 @@ bool Jacobi::Solve()
 double Jacobi::Residue(BasicMatrix auxiliar, BasicMatrix x0)
 {
   double normAuxiliar =  auxiliar.VectorNorm();
+  double subtraction;
+
+  if (normAuxiliar == -1)
+  {
+    return -1;
+  }
+
   auxiliar.Subtract(x0);
-  return auxiliar.VectorNorm()/normAuxiliar;
+  auxiliar.PrintMatrix();
+  subtraction = auxiliar.VectorNorm();
+  cout << "subtraction =  " << subtraction << endl;
+  cout << "normAuxiliar = " << normAuxiliar << endl;
+  cout << "division = " << subtraction/normAuxiliar << endl; 
+  return subtraction/normAuxiliar;
 }

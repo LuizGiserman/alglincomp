@@ -295,7 +295,7 @@ void BasicMatrix::Reduce(unsigned int index, BasicMatrix &result)
       {
         result.matrix[i][j] = this->matrix[row][col];
         j++;
-        if(j = result.n-1)
+        if(j == result.n)
         {
           j = 0;
           i++;

@@ -18,10 +18,8 @@ int main ()
   a.Cross(result, b);
   result.PrintMatrix(); 
  */
-  BasicMatrix a;
-  a.SetMatrix();
-  cout << "Determinant = " << a.Determinant(a) << endl;
-
+  Jacobi j;
+  j.Solve();
   return 0;
 
 }

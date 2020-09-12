@@ -34,13 +34,13 @@ class Jacobi : public LinearEquation
     Jacobi();
     double threshold = 0.0;
     bool Solve();
-    double Residue(BasicMatrix auxiliar, BasicMatrix x0);
 };
 
 class GaussSeidel : public LinearEquation
 {
   public:
     GaussSeidel();
+    double threshold = 0.0;
     bool Solve();
 };
 

@@ -40,6 +40,8 @@ class BasicMatrix : public Utilities
   bool IsSymmetric();
   double VectorNorm();
   bool Fill(double value);
+  bool IsDiagonallyDominant();
+  double Residue(BasicMatrix auxiliar, BasicMatrix x0);
 };
 
 #endif

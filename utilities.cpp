@@ -29,3 +29,12 @@ bool Utilities::VerifyInput(string str, bool canBeNegative, bool isDouble)
 	return true;
 }
 
+double Utilities::GetModule(double number)
+{
+  if (number < 0)
+  {
+    return -1 * number;
+  }
+
+  return number;
+}

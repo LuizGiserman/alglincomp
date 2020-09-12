@@ -159,16 +159,16 @@ bool LU::Solve()
   {
     return false;
   }
-  forwardResult.PrintMatrix(); 
   if(!this->BackwardsSubstitution(U, forwardResult, backwardsResult))
   {
     return false;
   }
-  backwardsResult.PrintMatrix();
   for (unsigned i = 0; i < backwardsResult.m; i++)
   {
     this->solution[i] = backwardsResult.matrix[i][0];
+    cout << "x[" << i << "] = " << solution[i] << " ";
   }
+
   return true;
 }
 
@@ -261,13 +261,34 @@ bool Cholesky::Decompose()
 
 bool Cholesky::Solve()
 {
-  return true;
+  
+  BasicMatrix forwardResult, backwardsResult;
 
+  if(!this->ForwardSubstitution(L, this->matrixB, forwardResult))
+  {
+    return false;
+  }
+  if(!this->BackwardsSubstitution(LT, forwardResult, backwardsResult))
+  {
+    return false;
+  }
+  for (unsigned i = 0; i < backwardsResult.m; i++)
+  {
+    this->solution[i] = backwardsResult.matrix[i][0];
+    cout << "x[" << i << "] = " << solution[i] << " ";
+  }
+  
+  return true;
 }
 
 Jacobi::Jacobi()
 {
   string str;
+  if (!this->matrixA.IsDiagonallyDominant())
+  {
+    cout << "Matrix A has to be diagonally dominant for Jacobi's method\n" << endl;
+    exit(ERROR_BAD_INPUT);
+  }
   cout << "Enter the Residual threshold: ";
   getline (cin, str);
   if (!VerifyInput(str, true, true))
@@ -280,8 +301,8 @@ Jacobi::Jacobi()
 
 bool Jacobi::Solve()
 {
-  unsigned int i, j;
-  unsigned int size = this->matrixA.m;
+  int i, j;
+  int size = (int) this->matrixA.m;
   BasicMatrix x0, auxiliar;
   double sum = 0;
   double residue;
@@ -302,7 +323,10 @@ bool Jacobi::Solve()
     {
       for (j=0; j < size; j++)
       {
-        sum = this->matrixA.matrix[i][j] * x0.matrix[j][0];
+        if (j != i)
+        {
+          sum += this->matrixA.matrix[i][j] * x0.matrix[j][0];
+        }
       }
       if (this->matrixA.matrix[i][i] == 0)
       {
@@ -311,38 +335,99 @@ bool Jacobi::Solve()
       auxiliar.matrix[i][0] = (this->matrixB.matrix[i][0] - sum)/this->matrixA.matrix[i][i];
       sum = 0;
     }
-    residue = this->Residue(auxiliar, x0);
+    residue = this->matrixA.Residue(auxiliar, x0);
     cout << "residue = " << residue << endl;
     x0 = auxiliar;
     x0.PrintMatrix();
-    break;
   }
-  while (residue> this->threshold);
+  while (residue > this->threshold);
 
   for (i = 0; i < size; i++)
   {
     this->solution[i] = x0.matrix[i][0];
   }
 
-  x0.PrintMatrix();  
+ /* x0.PrintMatrix();*/
+
   return true;
 }
 
-double Jacobi::Residue(BasicMatrix auxiliar, BasicMatrix x0)
+GaussSeidel::GaussSeidel()
 {
-  double normAuxiliar =  auxiliar.VectorNorm();
-  double subtraction;
-
-  if (normAuxiliar == -1)
+  string str;
+  if (!this->matrixA.IsDiagonallyDominant())
   {
-    return -1;
+    cout << "Matrix A has to be diagonally dominant for Gauss-Seidel's method\n" << endl;
+    exit(ERROR_BAD_INPUT);
+  }
+  cout << "Enter the Residual threshold: ";
+  getline (cin, str);
+  if (!VerifyInput(str, true, true))
+  {
+    cout << "Threshold has to be of type double\n";
+    exit(ERROR_BAD_INPUT);
+  }
+  stringstream(str) >> this->threshold;
+
+}
+
+bool GaussSeidel::Solve()
+{
+  
+  int i, j;
+  int size = (int) this->matrixA.m;
+  BasicMatrix x0, auxiliar;
+  double sumNew = 0.0, sumOld = 0.0;
+  double residue;
+
+  x0.m = size;
+  x0.n = 1;
+  x0.Allocate();
+  x0.Fill(1);
+
+  auxiliar.m = size;
+  auxiliar.n = 1;
+  auxiliar.Allocate();
+  
+  do
+  {
+    for (i=0; i < size; i++)
+    {
+      for (j=0; j < i; j++)
+      {
+        sumNew += this->matrixA.matrix[i][j] * auxiliar.matrix[j][0]; 
+      }
+      
+      for (j=i+1; j < size; j++)
+      {
+        sumOld += this->matrixA.matrix[i][j] * x0.matrix[j][0];
+      }
+
+      if (this->matrixA.matrix[i][i] == 0)
+      {
+        return false;
+      }
+      cout << "sumNew = " << sumNew << " sumOld = " << sumOld << endl; 
+      auxiliar.matrix[i][0] = (this->matrixB.matrix[i][0] - sumNew - sumOld)/this->matrixA.matrix[i][i];
+      sumOld = 0.0;
+      sumNew = 0.0;
+    }
+
+    residue = this->matrixA.Residue(auxiliar, x0); 
+    cout << "residue = " << residue << endl;
+
+    x0 = auxiliar; 
+    x0.PrintMatrix();
+     
+    auxiliar.Clear();
+    auxiliar.Allocate();
+    break; 
+  }while(residue > this->threshold); 
+ 
+  for (i = 0; i < size; i++)
+  {
+    this->solution[i] = x0.matrix[i][0];
   }
 
-  auxiliar.Subtract(x0);
-  auxiliar.PrintMatrix();
-  subtraction = auxiliar.VectorNorm();
-  cout << "subtraction =  " << subtraction << endl;
-  cout << "normAuxiliar = " << normAuxiliar << endl;
-  cout << "division = " << subtraction/normAuxiliar << endl; 
-  return subtraction/normAuxiliar;
+  return true;
 }

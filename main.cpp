@@ -18,7 +18,7 @@ int main ()
   a.Cross(result, b);
   result.PrintMatrix(); 
  */
-  Jacobi j;
+  GaussSeidel j;
   j.Solve();
   return 0;
 

@@ -17,7 +17,7 @@ class Utilities
     Utilities() {};
 
 	  bool VerifyInput(string str, bool canBeNegative, bool isDouble=false);
-
+    double GetModule(double number);
 };
 
 

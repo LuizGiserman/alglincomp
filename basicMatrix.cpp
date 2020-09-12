@@ -368,3 +368,48 @@ bool BasicMatrix::Fill(double value)
   }
   return true;
 }
+
+bool BasicMatrix::IsDiagonallyDominant()
+{
+  int size = (int) this->m;
+  int i, j;
+  double sumLines = 0, sumColumns;
+
+  for (i=0; i < size; i++)
+  {
+    for (j=0; j < size; j++)
+    {
+      if (j != i)
+      {
+        sumLines += GetModule(this->matrix[i][j]);
+        sumColumns += GetModule(this->matrix[j][i]);
+      }
+    }
+  
+    if (GetModule(this->matrix[i][i]) < sumLines || GetModule(this->matrix[i][i]) < sumColumns)
+    {
+      return false;
+    }
+    
+    sumLines = 0;
+    sumColumns = 0;
+  }
+
+  return true;
+
+}
+
+double BasicMatrix::Residue(BasicMatrix auxiliar, BasicMatrix x0)
+{
+  double normAuxiliar =  auxiliar.VectorNorm();
+  double subtraction;
+
+  if (normAuxiliar == -1)
+  {
+    return -1;
+  }
+
+  auxiliar.Subtract(x0);
+  subtraction = auxiliar.VectorNorm();
+  return subtraction/normAuxiliar;
+}

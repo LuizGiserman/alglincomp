@@ -12,9 +12,12 @@
 #include <string>
 #include <sstream>
 #include <math.h>
+#include <fstream>
 #include "utilities.h"
 
 #define ERROR_BAD_INPUT				1
+#define ERROR_READING_FILE    2
+
 using namespace std;
 
 class BasicMatrix : public Utilities
@@ -42,6 +45,7 @@ class BasicMatrix : public Utilities
   bool Fill(double value);
   bool IsDiagonallyDominant();
   double Residue(BasicMatrix auxiliar, BasicMatrix x0);
+  bool SetFromFile (string fileName);
 };
 
 #endif

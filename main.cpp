@@ -18,8 +18,9 @@ int main ()
   a.Cross(result, b);
   result.PrintMatrix(); 
  */
-  GaussSeidel j;
-  j.Solve();
+  BasicMatrix a;
+  a.SetFromFile("matrix.txt");
+  cout << "Determinant = " << a.Determinant(a) << endl;
   return 0;
 
 }

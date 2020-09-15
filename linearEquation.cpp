@@ -6,7 +6,7 @@
 
 #include "linearEquation.h"
 
-LinearEquation::LinearEquation()
+LinearEquation::LinearEquation(string s)
 {
   unsigned int numVar;
   string str;
@@ -19,21 +19,36 @@ LinearEquation::LinearEquation()
     exit(ERROR_BAD_INPUT);
   }
   stringstream(str) >> numVar;	
-
-  this->matrixA.m = numVar;
-  cout << "Regarding Matrix A:\n";
-  this->matrixA.SetMatrix();
   
-  this->matrixB.m = numVar;
-  this->matrixB.n = 1;
-  cout << "Regarding Matrix B:\n";
-  this->matrixB.SetMatrix();
+  if (s.compare("") == 0)
+  {
+    this->matrixA.m = numVar;
+    cout << "Regarding Matrix A:\n";
+    cout << "string = " << s << endl;
+    this->matrixA.SetMatrix();
+     
+  }
+  else
+  {
+    this->matrixA.SetFromFile(s);
+    if(this->matrixA.m != numVar)
+    {
+      cout << "Number of variables doesn't match the dimensions of matrix A\n";
+      exit (ERROR_BAD_INPUT);
+    }
+  } 
+  
   
   if (this->matrixA.Determinant(this->matrixA) == 0)
   {
     cout << "No consistent solution to this problem\n";
     exit(ERROR_NO_SOLUTION);
   }
+  
+  this->matrixB.m = numVar;
+  this->matrixB.n = 1;
+  cout << "Regarding Matrix B:\n";
+  this->matrixB.SetMatrix();
 
   this->numberVariables = numVar;
   solution.resize(this->numberVariables, 0);
@@ -114,8 +129,18 @@ bool LinearEquation::PrintSolution ()
 
 
 
-LU::LU()
+LU::LU(string s): LinearEquation(s)
 {
+  if (this->matrixA.m != this->matrixA.n)
+  {
+    cout << "Matrix must be squared for LU Decomposition" << endl;
+    exit (ERROR_BAD_INPUT);
+  }
+  if (this->matrixA.Determinant(this->matrixA) == 0)
+  {
+    cout << "Matrix can't be singular for LU Decomposition" << endl;
+    exit (ERROR_BAD_INPUT);
+  }
   this->matrixLU.Copy(this->matrixA);
   this->Decompose();
 }
@@ -215,7 +240,7 @@ void LU::MakeU (BasicMatrix &U)
   }
 }
 
-Cholesky::Cholesky()
+Cholesky::Cholesky(string s): LinearEquation(s)
 {
   if (!matrixA.IsSymmetric())
   {
@@ -357,8 +382,11 @@ GaussSeidel::GaussSeidel()
   string str;
   if (!this->matrixA.IsDiagonallyDominant())
   {
-    cout << "Matrix A has to be diagonally dominant for Gauss-Seidel's method\n" << endl;
-    exit(ERROR_BAD_INPUT);
+    if (!this->matrixA.IsSymmetric())
+    {
+      cout << "Matrix A has to be diagonally dominant (or deffinite symmetric) for Gauss-Seidel's method\n" << endl;
+      exit(ERROR_BAD_INPUT);
+    }
   }
   cout << "Enter the Residual threshold: ";
   getline (cin, str);
@@ -375,6 +403,7 @@ bool GaussSeidel::Solve()
 {
   
   int i, j;
+  int iteration = 0;
   int size = (int) this->matrixA.m;
   BasicMatrix x0, auxiliar;
   double sumNew = 0.0, sumOld = 0.0;
@@ -383,7 +412,7 @@ bool GaussSeidel::Solve()
   x0.m = size;
   x0.n = 1;
   x0.Allocate();
-  x0.Fill(1);
+  x0.SetMatrix();
 
   auxiliar.m = size;
   auxiliar.n = 1;
@@ -407,21 +436,19 @@ bool GaussSeidel::Solve()
       {
         return false;
       }
-      cout << "sumNew = " << sumNew << " sumOld = " << sumOld << endl; 
       auxiliar.matrix[i][0] = (this->matrixB.matrix[i][0] - sumNew - sumOld)/this->matrixA.matrix[i][i];
       sumOld = 0.0;
       sumNew = 0.0;
     }
 
     residue = this->matrixA.Residue(auxiliar, x0); 
-    cout << "residue = " << residue << endl;
 
     x0 = auxiliar; 
-    x0.PrintMatrix();
      
     auxiliar.Clear();
     auxiliar.Allocate();
-    break; 
+
+    iteration++;
   }while(residue > this->threshold); 
  
   for (i = 0; i < size; i++)

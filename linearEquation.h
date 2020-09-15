@@ -16,7 +16,7 @@
 class LinearEquation : public Utilities
 {
   public:
-    LinearEquation();
+    LinearEquation(string s="");
     virtual ~LinearEquation() { };
     BasicMatrix matrixA, matrixB;
     unsigned int numberVariables;
@@ -48,7 +48,8 @@ class GaussSeidel : public LinearEquation
 class LU : public LinearEquation
 {
   public:
-    LU();
+    LU(string s="");
+    
     BasicMatrix matrixLU;
     bool Decompose();
     void MakeL (BasicMatrix &L);
@@ -59,10 +60,10 @@ class LU : public LinearEquation
 class Cholesky : public LinearEquation
 {
   public:
-    Cholesky();
+    Cholesky(string s="");
     BasicMatrix L, LT;
     bool Decompose();
     bool Solve();
 };
-#endif
+#endif  
 

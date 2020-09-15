@@ -413,3 +413,37 @@ double BasicMatrix::Residue(BasicMatrix auxiliar, BasicMatrix x0)
   subtraction = auxiliar.VectorNorm();
   return subtraction/normAuxiliar;
 }
+
+bool BasicMatrix::SetFromFile(string fileName)
+{
+  
+  ifstream myFile;
+  vector<double> aux;
+  int i, j;
+  
+  myFile.open (fileName);
+  if (!myFile && !(myFile.is_open()))
+  {
+    std::cout << "Unable to open file" << std::endl;
+    exit (ERROR_READING_FILE);
+  }
+
+  myFile >> this->m;
+  myFile >> this->n;
+
+  if (this->m <= 0 || this->n <= 0)
+  {
+    return false;
+  }
+
+  this->Allocate();
+  
+  for (i=0; i < (int) this->m; i++)
+  {
+    for(j=0; j < (int) this->n; j++)
+    {
+      myFile >> this->matrix[i][j];
+    }
+  } 
+  return true;
+}

@@ -91,9 +91,9 @@ bool LinearEquation::BackwardsSubstitution(BasicMatrix triangular, BasicMatrix b
   result.Allocate();
   result.matrix[0][0] = b.matrix[0][0]/triangular.matrix[0][0];
 
-  for (i = triangular.m-1; i >= 0; i--)
+  for (i = (int) triangular.m-1; i >= 0; i--)
   {
-    for (j=i+1; j < triangular.m; j++)
+    for (j=i+1; j < (int) triangular.m; j++)
     {
       auxiliar += triangular.matrix[i][j] * result.matrix[j][0];
     }

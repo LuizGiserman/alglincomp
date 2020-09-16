@@ -132,7 +132,7 @@ bool BasicMatrix::Subtract(BasicMatrix matrixB)
 
 bool BasicMatrix::Clear()
 {
-  unsigned int i, j;
+  unsigned int i;
   if (this->matrix.empty())
   {
     return false;
@@ -256,7 +256,7 @@ bool BasicMatrix::Transpose(BasicMatrix &result)
 
 double BasicMatrix::Determinant(BasicMatrix matrix)
 {
-  unsigned int i, j, k;
+  unsigned int k;
   BasicMatrix newMatrix;
   double result = 0.0;
   

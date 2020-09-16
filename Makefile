@@ -7,24 +7,21 @@ AR = ar
 
 #linkedit
 DEBUG = -D _MY_DEBUG_
-CFLAGS = -Wall -O3
-LFLAGS = -Wall
+CFLAGS = -Wall -g
+LDFLAGS = -Wall
 
 AFLAGS = -r
 
+SOURCES = main.cpp utilities.cpp basicMatrix.cpp linearEquation.cpp
+LISTA1MAIN = lista1Main
+LISTAMAINOBJS = $(SOURCES:.c=.o)
 
-LISTAMAIN = lista1Main
-LISTAMAINOBJS = basicMatrix.o main.o linearEquation.o utilities.o
+EXECS = $(LISTA1MAIN)
 
-EXECS = $(LISTAMAIN)
+ALL = $(LISTA1MAIN)
 
-ALL = $(LISTAMAIN)
-
-#Regra Implicita
-.c.o: $(CC) $(CFLAGS) -c $<
-
-lista1Main : $(LISTAMAINOBJS)
-	$(LD) $(LFLAGS) -o $@ $(LISTAMAINOBJS)
+$(LISTA1MAIN) : $(LISTAMAINOBJS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:
 	rm -f *.o $(ALL)

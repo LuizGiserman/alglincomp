@@ -193,9 +193,17 @@ bool BasicMatrix::Cross(BasicMatrix &result, BasicMatrix matrixB)
   {
     return false;
   }
-  result.n = matrixB.n;
-  result.m = this->m;
-  result.Allocate();
+  
+  if (result.n == 0 || result.m == 0)
+  {
+    result.n = matrixB.n;
+    result.m = this->m;
+  }
+  if(result.matrix.empty())
+  {
+    result.Allocate();
+  }
+
   for (unsigned int i = 0; i < this->m; i++)
   {
     for (unsigned int j = 0; j < matrixB.n; j++)
@@ -239,10 +247,15 @@ bool BasicMatrix::Copy(BasicMatrix a)
 bool BasicMatrix::Transpose(BasicMatrix &result)
 {
   unsigned int i, j;
-  result.m = this->m;
-  result.n = this->n;
-  result.Allocate();
-
+  if (result.m == 0 || result.n == 0)
+  {
+    result.m = this->m;
+    result.n = this->n;
+  }
+  if (result.matrix.empty())
+  {
+    result.Allocate();
+  }
   for (i=0; i < result.m; i++)
   {
     for (j=0; j < result.n; j++)
@@ -445,5 +458,215 @@ bool BasicMatrix::SetFromFile(string fileName)
       myFile >> this->matrix[i][j];
     }
   } 
+  return true;
+}
+
+double BasicMatrix::PowerMethod (double threshold, BasicMatrix &eigenVector)
+{
+  BasicMatrix x0;
+  double oldEigenValue= 1.0;
+  double eigenValue;
+  double residue;
+  x0.m = this->m;
+  x0.n = 1;
+  int iteration = 0;
+  x0.Allocate();
+  x0.Fill(1);
+
+  do{
+  
+    this->Cross(eigenVector, x0);
+    eigenValue = eigenVector.matrix[0][0];
+
+    for (auto &rows : eigenVector.matrix)
+    {
+      for (auto &columns :rows)
+      {
+        columns /= eigenValue;
+      }
+    }
+
+    residue = GetModule(eigenValue - oldEigenValue) / GetModule (eigenValue);
+    cout << "iteration: " << iteration << endl;
+    cout << "old eigenValue = " << oldEigenValue << endl;
+    cout << "new eigenValue = " << eigenValue << endl; 
+    cout << "old eigenVector:" << endl;
+    x0.PrintMatrix();
+    cout << "new eigenVector:" << endl;
+    eigenVector.PrintMatrix();
+    cout << "residue = " << residue << endl;
+   
+    oldEigenValue = eigenValue;
+
+    x0 = eigenVector;
+    eigenVector.Fill(0);    
+    iteration++;
+  }while(residue > threshold);  
+
+  return eigenValue;  
+}
+
+void BasicMatrix::Jacobi (double tolerance)
+{
+  BasicMatrix P, Pt;
+  pair<unsigned int, unsigned int> indicesElement;
+  BasicMatrix aNew, aOld, xNew, xOld, auxiliar;
+  int iteration = 0;
+
+  aOld.Copy(*this);
+  aNew = aOld; 
+  xOld.MakeIdentity(this->m);
+  xNew = xOld;
+  if (!this->IsSymmetric())
+  {
+    cout << "For Jacobi's iterative method, the matrix has to be symmetric\n";
+    exit (ERROR_BAD_INPUT);
+  }
+  
+  while(aNew.VerifyToleranceJacobi(tolerance))
+  {
+    /*reset values*/
+    aOld = aNew;
+    xOld = xNew;
+    aNew.Clear();
+    xNew.Clear();
+    auxiliar.Clear();
+    
+    /*get indices of highest module*/
+    indicesElement = aOld.GetIndices();
+
+    /*make matrix P*/
+    aOld.MakeP(indicesElement, P);
+    
+    cout << "iteration: " << iteration << endl;
+    cout << "indices i, j = " << indicesElement.first + 1 << ", " << indicesElement.second + 1 << endl;
+    cout << "P:\n";
+    P.PrintMatrix();
+    
+    /*Make Ak+1*/
+    P.Transpose(Pt);
+    /*A(k+1) = Pkt x Ak x Pk*/
+    Pt.Cross(auxiliar, aOld);
+    auxiliar.Cross(aNew, P);
+  
+    cout << "aNew: \n";
+    aNew.PrintMatrix(); 
+    
+    /*Make X+1*/
+    xOld.Cross(xNew, P);
+    cout << "xNew: \n";
+    xNew.PrintMatrix();
+
+    iteration++;
+  }
+  cout << "eigenValues: " << endl;
+  xNew.PrintMatrix();
+  cout << "eigenVectors: "<< endl;
+  aNew.PrintMatrix();
+}
+
+bool BasicMatrix::VerifyToleranceJacobi (double tolerance)
+{
+  int i, j;
+
+  for (i=0; i < (int) this->m; i++)
+  {
+    for (j=0; j < (int) this->n; j++)
+    {
+      if (i!=j)
+      {
+        if (GetModule(this->matrix[i][j]) > tolerance)
+        {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+pair<unsigned int, unsigned int> BasicMatrix::GetIndices ()
+{
+  int i, j;
+  pair<unsigned int, unsigned int> indicesElement =  make_pair(0, 0);
+  double maxValue = 0.0;
+
+  for (i=0; i < (int) this->m; i++)
+  {
+    for (j=0; j < (int) this->n; j++)
+    {
+      if (i!=j)
+      {
+        if (GetModule(this->matrix[i][j]) > maxValue)
+        {
+          maxValue = GetModule(this->matrix[i][j]);
+          indicesElement = make_pair((unsigned int) i, (unsigned int) j);
+        }
+      }
+    }
+  }
+
+  return indicesElement;
+}
+
+bool BasicMatrix::MakeIdentity(unsigned int size)
+{
+  int i, j;
+  if(size != 0)
+  {
+    this->m = size;
+    this->n = size;
+  }
+
+  if (this->m != this->n)
+  {
+    return false;
+  }
+  if (this->matrix.empty())
+  {
+    this->Allocate();
+  }
+
+  for(i = 0; i < (int) this->m; i++)
+  {
+    for (j = 0; j < (int) this->n; j++)
+    {
+      if (j==i)
+      {
+        this->matrix[i][j] = 1;
+      }
+      else
+      {
+        this->matrix[i][j] = 0;
+      }
+    }
+  }
+  return true;
+}
+
+bool BasicMatrix::MakeP (pair<unsigned int, unsigned int> indicesElement, BasicMatrix &result)
+{
+  BasicMatrix identity;
+  double phi;
+  unsigned int i, j;
+  i = indicesElement.first;
+  j = indicesElement.second;
+  
+  if (this->matrix[i][i] != this->matrix[j][j])
+  {
+    phi = atan((2*this->matrix[i][j])/(this->matrix[i][i] - this->matrix[j][j]))/2;
+  }
+  else
+  {
+    phi = PI/4.0;
+  }
+  
+  identity.MakeIdentity(this->m);
+  identity.matrix[i][i] = cos (phi);
+  identity.matrix[i][j] = -1.0*sin(phi);
+  identity.matrix[j][j] = cos(phi);
+  identity.matrix[j][i] = sin(phi);
+
+  result = identity;
   return true;
 }

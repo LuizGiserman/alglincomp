@@ -20,7 +20,7 @@ int main ()
  */
   BasicMatrix a;
   a.SetFromFile("matrix.txt");
-  cout << "Determinant = " << a.Determinant(a) << endl;
+  a.Jacobi(0.02);
   return 0;
 
 }

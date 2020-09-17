@@ -17,6 +17,7 @@
 
 #define ERROR_BAD_INPUT				1
 #define ERROR_READING_FILE    2
+#define PI 3.141592653589793238462643383279502884197169399
 
 using namespace std;
 
@@ -46,6 +47,13 @@ class BasicMatrix : public Utilities
   bool IsDiagonallyDominant();
   double Residue(BasicMatrix auxiliar, BasicMatrix x0);
   bool SetFromFile (string fileName);
+  double PowerMethod (double treshold, BasicMatrix &eigenVector);
+  bool MakeIdentity(unsigned int size);
+  void Jacobi(double tolerance);
+  private:
+    pair<unsigned int, unsigned int> GetIndices ();
+    bool VerifyToleranceJacobi(double tolerance);
+    bool MakeP (pair <unsigned int, unsigned int> indicesElement, BasicMatrix &result);
 };
 
 #endif

@@ -1,5 +1,6 @@
 #include "basicMatrix.h"
 #include "linearEquation.h"
+#include "mmse.h"
 
 int main ()
 {
@@ -18,9 +19,8 @@ int main ()
   a.Cross(result, b);
   result.PrintMatrix(); 
  */
-  BasicMatrix a;
-  a.SetFromFile("matrix.txt");
-  a.Jacobi(0.02);
+  MMSE c("matrixX.txt", "matrixY.txt");
+  c.Solve();
   return 0;
 
 }

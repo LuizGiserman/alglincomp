@@ -246,24 +246,23 @@ bool BasicMatrix::Copy(BasicMatrix a)
 
 bool BasicMatrix::Transpose(BasicMatrix &result)
 {
-  unsigned int i, j;
+  int i, j;
   if (result.m == 0 || result.n == 0)
   {
-    result.m = this->m;
-    result.n = this->n;
+    result.m = this->n;
+    result.n = this->m;
   }
   if (result.matrix.empty())
   {
     result.Allocate();
   }
-  for (i=0; i < result.m; i++)
+  for (i=0; i < (int) result.m; i++)
   {
-    for (j=0; j < result.n; j++)
+    for (j=0; j < (int) result.n; j++)
     {
       result.matrix[i][j] = this->matrix[j][i];
     }
   }
-
   return true;
 }
 
@@ -660,7 +659,7 @@ bool BasicMatrix::MakeP (pair<unsigned int, unsigned int> indicesElement, BasicM
   {
     phi = PI/4.0;
   }
-  
+  cout << "Phi = " << phi << endl; 
   identity.MakeIdentity(this->m);
   identity.matrix[i][i] = cos (phi);
   identity.matrix[i][j] = -1.0*sin(phi);

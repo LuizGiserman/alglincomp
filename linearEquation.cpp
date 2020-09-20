@@ -55,6 +55,11 @@ LinearEquation::LinearEquation(string s)
 
 }
 
+LinearEquation::LinearEquation(bool empty)
+{
+  solution.resize(this->numberVariables, 0);
+}
+
 bool LinearEquation::ForwardSubstitution(BasicMatrix triangular, BasicMatrix b, BasicMatrix &result)
 {
   unsigned int i, j;
@@ -145,6 +150,26 @@ LU::LU(string s): LinearEquation(s)
   this->Decompose();
 }
 
+LU::LU (bool empty) : LinearEquation(empty)
+{
+}
+
+void LU::Check()
+{
+  if (this->matrixA.m != this->matrixA.n)
+  {
+    cout << "Matrix must be squared for LU Decomposition" << endl;
+    exit (ERROR_BAD_INPUT);
+  }
+  if (this->matrixA.Determinant(this->matrixA) == 0)
+  {
+    cout << "Matrix can't be singular for LU Decomposition" << endl;
+    exit (ERROR_BAD_INPUT);
+  }
+  this->matrixLU.Copy(this->matrixA);
+  this->Decompose();
+}
+
 bool LU::Decompose() 
 {
   unsigned int k, i, j;
@@ -178,7 +203,9 @@ bool LU::Solve()
   MakeL(L);
   MakeU(U); 
 
+  cout << "L: \n";
   L.PrintMatrix();
+  cout << "U: \n";
   U.PrintMatrix();
   if(!this->ForwardSubstitution(L, this->matrixB, forwardResult))
   {
@@ -288,7 +315,7 @@ bool Cholesky::Solve()
 {
   
   BasicMatrix forwardResult, backwardsResult;
-
+  
   if(!this->ForwardSubstitution(L, this->matrixB, forwardResult))
   {
     return false;
@@ -306,7 +333,8 @@ bool Cholesky::Solve()
   return true;
 }
 
-Jacobi::Jacobi()
+
+Jacobi::Jacobi(string s) : LinearEquation(s)
 {
   string str;
   if (!this->matrixA.IsDiagonallyDominant())
@@ -331,6 +359,7 @@ bool Jacobi::Solve()
   BasicMatrix x0, auxiliar;
   double sum = 0;
   double residue;
+  int iteration = 0;
 
   x0.m = size;
   x0.n = 1;
@@ -360,10 +389,13 @@ bool Jacobi::Solve()
       auxiliar.matrix[i][0] = (this->matrixB.matrix[i][0] - sum)/this->matrixA.matrix[i][i];
       sum = 0;
     }
+    
     residue = this->matrixA.Residue(auxiliar, x0);
+    cout << "iteration: " << iteration << endl;
     cout << "residue = " << residue << endl;
     x0 = auxiliar;
     x0.PrintMatrix();
+    iteration++;
   }
   while (residue > this->threshold);
 
@@ -377,7 +409,7 @@ bool Jacobi::Solve()
   return true;
 }
 
-GaussSeidel::GaussSeidel()
+GaussSeidel::GaussSeidel(string s) : LinearEquation(s)
 {
   string str;
   if (!this->matrixA.IsDiagonallyDominant())
@@ -444,6 +476,9 @@ bool GaussSeidel::Solve()
     residue = this->matrixA.Residue(auxiliar, x0); 
 
     x0 = auxiliar; 
+    cout << "iteration: " << iteration << endl;
+    cout << "residue = " << residue << endl;
+    x0.PrintMatrix();
      
     auxiliar.Clear();
     auxiliar.Allocate();

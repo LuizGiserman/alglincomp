@@ -17,6 +17,7 @@ class LinearEquation : public Utilities
 {
   public:
     LinearEquation(string s="");
+    LinearEquation(bool empty);
     virtual ~LinearEquation() { };
     BasicMatrix matrixA, matrixB;
     unsigned int numberVariables;
@@ -31,7 +32,7 @@ class LinearEquation : public Utilities
 class Jacobi : public LinearEquation
 {
   public:
-    Jacobi();
+    Jacobi(string s="");
     double threshold = 0.0;
     bool Solve();
 };
@@ -39,7 +40,7 @@ class Jacobi : public LinearEquation
 class GaussSeidel : public LinearEquation
 {
   public:
-    GaussSeidel();
+    GaussSeidel(string s="");
     double threshold = 0.0;
     bool Solve();
 };
@@ -49,9 +50,10 @@ class LU : public LinearEquation
 {
   public:
     LU(string s="");
-    
+    LU(bool empty);
     BasicMatrix matrixLU;
     bool Decompose();
+    void Check();
     void MakeL (BasicMatrix &L);
     void MakeU (BasicMatrix &U);
     bool Solve();

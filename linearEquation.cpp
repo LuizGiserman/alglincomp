@@ -274,6 +274,11 @@ Cholesky::Cholesky(string s): LinearEquation(s)
     cout << "Matrix must be symetric for cholesky's decomposition\n";
     exit(ERROR_BAD_INPUT);
   }
+  if (!matrixA.IsPositiveDefinite())
+  {
+    cout << "Matrix must be positive definite\n";
+    exit(ERROR_BAD_INPUT);
+  }
   this->L.m = this->matrixA.m;
   this->L.n = this->matrixA.n;
   this->L.Allocate();
@@ -414,7 +419,7 @@ GaussSeidel::GaussSeidel(string s) : LinearEquation(s)
   string str;
   if (!this->matrixA.IsDiagonallyDominant())
   {
-    if (!this->matrixA.IsSymmetric())
+    if (!this->matrixA.IsSymmetric() || !this->matrixA.IsPositiveDefinite())
     {
       cout << "Matrix A has to be diagonally dominant (or deffinite symmetric) for Gauss-Seidel's method\n" << endl;
       exit(ERROR_BAD_INPUT);
@@ -476,10 +481,10 @@ bool GaussSeidel::Solve()
     residue = this->matrixA.Residue(auxiliar, x0); 
 
     x0 = auxiliar; 
-    cout << "iteration: " << iteration << endl;
-    cout << "residue = " << residue << endl;
+  /*cout << "iteration: " << iteration << endl;
+    cout << "residue = " << residue << endl; 
     x0.PrintMatrix();
-     
+  */
     auxiliar.Clear();
     auxiliar.Allocate();
 

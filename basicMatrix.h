@@ -50,6 +50,7 @@ class BasicMatrix : public Utilities
   double PowerMethod (double treshold, BasicMatrix &eigenVector);
   bool MakeIdentity(unsigned int size);
   void Jacobi(double tolerance);
+  bool IsPositiveDefinite();
   private:
     pair<unsigned int, unsigned int> GetIndices ();
     bool VerifyToleranceJacobi(double tolerance);

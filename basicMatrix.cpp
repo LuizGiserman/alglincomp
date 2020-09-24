@@ -537,10 +537,10 @@ void BasicMatrix::Jacobi (double tolerance)
     /*make matrix P*/
     aOld.MakeP(indicesElement, P);
     
-    cout << "iteration: " << iteration << endl;
+    /*cout << "iteration: " << iteration << endl;
     cout << "indices i, j = " << indicesElement.first + 1 << ", " << indicesElement.second + 1 << endl;
     cout << "P:\n";
-    P.PrintMatrix();
+    P.PrintMatrix();*/
     
     /*Make Ak+1*/
     P.Transpose(Pt);
@@ -548,19 +548,19 @@ void BasicMatrix::Jacobi (double tolerance)
     Pt.Cross(auxiliar, aOld);
     auxiliar.Cross(aNew, P);
   
-    cout << "aNew: \n";
-    aNew.PrintMatrix(); 
+   /* cout << "aNew: \n";
+    aNew.PrintMatrix(); */
     
     /*Make X+1*/
     xOld.Cross(xNew, P);
-    cout << "xNew: \n";
-    xNew.PrintMatrix();
+   /* cout << "xNew: \n";
+    xNew.PrintMatrix();*/
 
     iteration++;
   }
-  cout << "eigenValues: " << endl;
+  cout << "eigenVectors: " << endl;
   xNew.PrintMatrix();
-  cout << "eigenVectors: "<< endl;
+  cout << "eigenValues: "<< endl;
   aNew.PrintMatrix();
 }
 
@@ -667,5 +667,43 @@ bool BasicMatrix::MakeP (pair<unsigned int, unsigned int> indicesElement, BasicM
   identity.matrix[j][i] = sin(phi);
 
   result = identity;
+  return true;
+}
+
+bool BasicMatrix::IsPositiveDefinite ()
+{
+  BasicMatrix aux;
+  int i, j;
+  int count, sizei, sizej;
+  aux = (*this);
+
+  sizei = this->m;
+  sizej = this->n;
+  
+  for (count = 0; count < (int) this->m; count++)
+  {
+  
+    if (aux.Determinant(aux) <=0)
+    {
+      return false;
+    }
+
+    sizei = this->m -1;
+    sizej = this->n-1;
+    aux.Clear();
+    aux.m = sizei;
+    aux.n = sizej;
+    aux.Allocate();
+        
+    for (i = 0; i < (int) sizei; i++)
+    {
+      for (j = 0; j < (int) sizej; j++)
+      {
+        aux.matrix[i][j] = this->matrix[i][j];
+      }
+    }
+
+  }
+
   return true;
 }

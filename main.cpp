@@ -19,8 +19,9 @@ int main ()
   a.Cross(result, b);
   result.PrintMatrix(); 
  */
-  MMSE c("matrixX.txt", "matrixY.txt");
-  c.Solve();
+  BasicMatrix c;
+  c.SetFromFile("matrix.txt");
+  c.Jacobi(0.001);
   return 0;
 
 }

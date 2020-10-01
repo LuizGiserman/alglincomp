@@ -17,7 +17,7 @@
 class MMSE : public Utilities
 {
   public:
-    MMSE(string x="", string y="");
+    MMSE();
     void Solve();
     unsigned int numVar = 0;
     BasicMatrix X;

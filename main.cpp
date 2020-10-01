@@ -1,7 +1,7 @@
 #include "basicMatrix.h"
 #include "linearEquation.h"
 #include "mmse.h"
-
+#include "nonLinearSolutions.h"
 int main ()
 {
 
@@ -19,9 +19,10 @@ int main ()
   a.Cross(result, b);
   result.PrintMatrix(); 
  */
-  BasicMatrix c;
-  c.SetFromFile("matrix.txt");
-  c.Jacobi(0.001);
+  ExOne a;
+  cout << "f(277.221) = " << a.Function(277.221) << endl;;
+  /*a.Solve();
+  cout << "Solution: " << a.solution << endl;*/
   return 0;
 
 }

@@ -7,7 +7,7 @@
 #include "utilities.h"
 #include "mmse.h"
 
-MMSE::MMSE(string x, string y) : eq(true)
+MMSE::MMSE() : eq(true)
 {
   string str;
   cout << "How many variables will your approximation have?" << endl;
@@ -19,51 +19,39 @@ MMSE::MMSE(string x, string y) : eq(true)
   }
   stringstream(str) >> this-> numVar;
 
-  if (x != "")
+  cout << "How many points would you like to enter? " << endl;
+  getline (cin, str);
+  if (!VerifyInput(str, false))
   {
-    this->X.SetFromFile(x);
+   cout << "Number of variables has to be of type unsigned int\n";
+   exit(ERROR_BAD_INPUT);
+  }
+  stringstream(str) >> this->X.m;
+  this->X.n = 1;
+  cout << "Regarding the X values, please enter: " << endl;
+  this->X.SetMatrix();  
+  
+  if(X.m != 0)
+  {
+    this->Y.m = this->X.m;
+    this->Y.n = 1;
+    cout << "Regarding the Y values, please enter: "<< endl;
+    this->Y.SetMatrix();
   }
   else
   {
-    cout << "How many points would you like to enter? " << endl;
-    getline (cin, str);
-    if (!VerifyInput(str, false))
-    {
-     cout << "Number of variables has to be of type unsigned int\n";
-     exit(ERROR_BAD_INPUT);
-    }
-    stringstream(str) >> this->X.m;
-    this->X.n = 1;
-    cout << "Regarding the X values, please enter: " << endl;
-    this->X.SetMatrix();  
+    cout << "You have to enter at least 1 coordinate for the SSME methods" << endl;
+    exit (ERROR_BAD_INPUT);
   }
-  if (y != "")
-  {
-    this->Y.SetFromFile(y);
-  }
-  else
-  {
-    if(X.m != 0)
-    {
-      this->Y.m = this->X.m;
-      this->Y.n = 1;
-      cout << "Regarding the Y values, please enter: "<< endl;
-      this->Y.SetMatrix();
-    }
-    else
-    {
-      cout << "You have to enter at least 1 coordinate for the SSME methods" << endl;
-      exit (ERROR_BAD_INPUT);
-    }
-  }  
   
 }
 
 void MMSE::Solve()
 {
+  cout << "in solve" << endl;
   int i = 0;
   this->P.m = this->X.m;
-  this->P.n = 2;
+  this->P.n = this->numVar;
   P.Allocate();
   
   for (i = 0; i < int(P.m); i++)

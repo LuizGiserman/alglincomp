@@ -12,7 +12,7 @@ LDFLAGS = -Wall
 
 AFLAGS = -r
 
-SOURCES = main.cpp utilities.cpp basicMatrix.cpp linearEquation.cpp mmse.cpp
+SOURCES = main.cpp utilities.cpp basicMatrix.cpp linearEquation.cpp mmse.cpp nonLinearSolutions.cpp
 LISTA1MAIN = lista1Main
 LISTAMAINOBJS = $(SOURCES:.c=.o)
 

@@ -10,7 +10,6 @@
 Bissection::Bissection() 
 {
   string str;
-  double a, b, tolerance;
 
   cout << "Enter the value A" << endl;
   getline (cin, str);
@@ -19,7 +18,7 @@ Bissection::Bissection()
    cout << "A has to be of type double\n";
    exit(ERROR_BAD_INPUT);
   }
-  stringstream(str) >> a;
+  stringstream(str) >> this-> a;
 
   cout << "Enter the value B" << endl;
   getline (cin, str);
@@ -28,13 +27,7 @@ Bissection::Bissection()
    cout << "B has to be of type double\n";
    exit(ERROR_BAD_INPUT);
   }
-  stringstream(str) >> b;
-  
-  if (!CheckConditions(a, b))
-  {
-    cout <<"One negative and one positive value is needed" << endl;
-    exit(ERROR_BAD_INPUT);
-  }
+  stringstream(str) >> this-> b;
   
   cout << "Enter the tolerance" << endl;
   getline (cin, str);
@@ -43,8 +36,7 @@ Bissection::Bissection()
    cout << "Tolerance has to be of type double\n";
    exit(ERROR_BAD_INPUT);
   }
-  stringstream(str) >> tolerance;
-  this->tol = tolerance;
+  stringstream(str) >> this->tol;
 
 }
 
@@ -55,11 +47,17 @@ Bissection::Bissection(double tolerance)
 
 Bissection::Bissection(double a, double b)
 {
-  if (!CheckConditions(a, b))
+  string str; 
+  
+  cout << "Enter the tolerance" << endl;
+  getline (cin, str);
+  if (!VerifyInput(str, true, true))
   {
-    cout <<"One negative and one positive value is needed" << endl;
-    exit(ERROR_BAD_INPUT);
+   cout << "Tolerance has to be of type double\n";
+   exit(ERROR_BAD_INPUT);
   }
+  stringstream(str) >> this->tol;
+
 }
 
 Bissection::Bissection(double a, double b, double tolerance)
@@ -69,34 +67,35 @@ Bissection::Bissection(double a, double b, double tolerance)
 }
 
 
-bool Bissection::CheckConditions (double a, double b)
+bool Bissection::CheckConditions ()
 {
-  double valueA, valueB;
+  double valueA, valueB, aux;
   
-  valueA = Function(a);
-  valueB = Function(b);
+  valueA = this->Function(this->a);
+  valueB = this->Function(this->b);
 
+  cout << "a = " << a << endl << "b = " << b << endl << "valueA = " << valueA << endl << "valueB = " << valueB << endl;
   if (valueA == 0)
   {
-    this->solution = a;
+    this->solution = this->a;
   }
   else if(valueB == 0)
   {
-    this->solution = b;
+    this->solution = this->b;
   }
   else if(valueA < 0 && valueB > 0)
   {
-    this->a = a;
-    this->b = b;
   }
   else if(valueB < 0 && valueA > 0)
   {
-    this->a = b;
-    this->b = a;
+    aux = this->a;
+    this->a = this->b;
+    this->b = aux;
   }
   else
   {
-    return false;
+    cout <<"One negative and one positive value is needed" << endl;
+    exit(ERROR_BAD_INPUT);
   }
 
   return true;
@@ -105,15 +104,16 @@ bool Bissection::CheckConditions (double a, double b)
 void Bissection::Solve()
 {
   
-  double a, b, tol, x;
+  double a, b, tol, x=0;
   
   a = this-> a;
   b = this-> b;
   tol = this-> tol;
-
-  while (GetModule(b-a) > tol)
+  cout << "a, b, tol : " << a << ", " << b << ", " << tol << endl;
+  while (GetModule((b-a)) > tol)
   {
     x = (a+b)/2.0;
+    cout << "Module -> " << GetModule(b-a) << ", x = " << x << endl;
     if (Function(x) > 0.0)
     {
       b = x;
@@ -127,9 +127,112 @@ void Bissection::Solve()
   this->solution = x;
 }
 
-double ExOne::Function (double value)
-{
-  double g = 9.806;
-  double k = 0.00341;
-  return (double) log(cosh(sqrt(g*k))) - 50.0;
+
+Newton::Newton()
+{  
+  string str; 
+  
+  cout << "Enter the first X" << endl;
+  getline (cin, str);
+  if (!VerifyInput(str, true, true))
+  {
+   cout << "X has to be of type double\n";
+   exit(ERROR_BAD_INPUT);
+  }
+  stringstream(str) >> this->x0;
+  
+
+  cout << "Enter the number of iterations" << endl;
+  getline (cin, str);
+  if (!VerifyInput(str, false))
+  {
+   cout << "Number of iterations has to be of type int\n";
+   exit(ERROR_BAD_INPUT);
+  }
+  stringstream(str) >> this->niter;
+
+  cout << "Enter the tolerance" << endl;
+  getline (cin, str);
+  if (!VerifyInput(str, true, true))
+  {
+   cout << "Tolerance has to be of type double\n";
+   exit(ERROR_BAD_INPUT);
+  }
+  stringstream(str) >> this->tol;
+
 }
+
+Newton::Newton (double x0, double tol)
+{
+  string str;
+
+  cout << "Enter the number of iterations" << endl;
+  getline (cin, str);
+  if (!VerifyInput(str, false))
+  {
+   cout << "Number of iterations has to be of type int\n";
+   exit(ERROR_BAD_INPUT);
+  }
+  stringstream(str) >> this->niter;
+
+  this->x0 = x0;
+  this->tol = tol;
+
+}
+
+Newton::Newton (double x0, int niter, double tol)
+{
+  this->x0 = x0;
+  this->niter = niter;
+  this->tol = tol;
+}
+
+void Newton::Solve()
+{
+  int k;
+  double newX, oldX;
+  oldX = this->x0;
+  
+  for (k = 0; k < this->niter; k++)
+  {
+    newX =  oldX - (this->Function(oldX)/this->Derivative(oldX));
+    cout << "newX = " << newX << " oldX = " << oldX << endl;
+    if (GetModule(newX - oldX) < this->tol)
+    {
+      cout << "result: "  << newX << endl;
+      return;
+    }
+    oldX = newX;
+  }
+  cout << "convergence not reached" << endl;
+  return;
+}
+
+void Newton::SecantSolve()
+{
+  double deltaX = 0.001;
+  double fa, fi;
+  double newX, currentX;
+  double oldX = this->x0;
+  int k;
+
+  currentX = oldX + deltaX;
+  fa = this->Function(oldX);
+  
+  for (k = 0; k < this->niter; k++)
+  {
+    fi = this->Function(currentX);
+    newX =  currentX - fi * (currentX-oldX)/ (fi-fa);
+    if(GetModule(newX - currentX) < this->tol)
+    {
+      cout << "Result : " << currentX << endl;
+      return;
+    }
+    fa = fi;
+    oldX = currentX;
+    currentX = newX;
+  }
+  cout << "convergence not reached" << endl;
+}
+
+

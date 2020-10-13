@@ -9,6 +9,7 @@
 
 #include <math.h>
 #include <string>
+#include <algorithm>
 #include "basicMatrix.h"
 #include "linearEquation.h"
 
@@ -33,20 +34,20 @@ class Bissection : public Utilities
 class ExOneBissection : public Bissection
 {
   public:
-    ExOneBissection() {};
-    ExOneBissection(double a, double b, double tolerance) : Bissection(a, b, tolerance) {};
-    ExOneBissection(double a, double b) : Bissection (a, b) {};
-    ExOneBissection(double tolerance) : Bissection (tolerance) {};
+    ExOneBissection() {this->CheckConditions();};
+    ExOneBissection(double a, double b, double tolerance) : Bissection(a, b, tolerance) {this->CheckConditions();};
+    ExOneBissection(double a, double b) : Bissection (a, b) {this->CheckConditions();};
+    ExOneBissection(double tolerance) : Bissection (tolerance) {this->CheckConditions();};
     double Function(double value) {return FunctionOne(value);};
 };
 
 class ExTwoBissection : public Bissection
 {
   public:
-    ExTwoBissection() {};
-    ExTwoBissection(double a, double b, double tolerance) : Bissection(a, b, tolerance) {};
-    ExTwoBissection(double a, double b) : Bissection (a, b) {};
-    ExTwoBissection(double tolerance) : Bissection (tolerance) {};
+    ExTwoBissection() {this->CheckConditions();};
+    ExTwoBissection(double a, double b, double tolerance) : Bissection(a, b, tolerance) {this->CheckConditions();};
+    ExTwoBissection(double a, double b) : Bissection (a, b) {this->CheckConditions();};
+    ExTwoBissection(double tolerance) : Bissection (tolerance) {this->CheckConditions();};
     double Function(double value) {return FunctionTwo(value);};
 };
 
@@ -88,4 +89,36 @@ class ExTwoNewton : public Newton
     double Derivative(double value) {return this->DerivativeTwo(value);};
 };
 #endif  
+
+class InverseInterpolation : public Utilities
+{
+  public:
+    InverseInterpolation();
+    InverseInterpolation(double x1, double x2, double x3);
+    InverseInterpolation(double x1, double x2, double x3, int niter);
+    void Solve();
+
+    vector<double> xInicial;
+    int niter;
+    double tol =0.0001;
+
+    virtual double Function (double value) {return 0.0;};
+    double LaGrange(vector <double> x);
+    pair<int, double> GetElementAndIndex(vector <double> x);
+};
+
+class ExOneII : public InverseInterpolation
+{
+  public:
+    ExOneII() {};
+    ExOneII(double x1, double x2, double x3) : InverseInterpolation(x1, x2, x3) {};
+    ExOneII(double x1, double x2, double x3, int niter) : InverseInterpolation(x1, x2, x3, niter) {}; 
+
+    double Function(double value) {return this->FunctionOne(value);};
+};
+// class Comparator : InverseInterpolation
+// {
+//   public:
+//   bool operator()(double x, double y) {return (this->Function(x) < this->Function(y));};
+// };
 

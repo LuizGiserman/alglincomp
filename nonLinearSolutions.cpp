@@ -235,4 +235,129 @@ void Newton::SecantSolve()
   cout << "convergence not reached" << endl;
 }
 
+InverseInterpolation::InverseInterpolation ()
+{
+  int i;
+  string str; 
+  string elements [] = {"first", "second", "third"};
+ 
+  this->xInicial.resize(3, 0);
+
+  for (i=0; i < 3; i++)
+  {
+    cout << "Enter the " << elements[i] << " X" << endl; 
+    getline (cin, str);
+    if (!VerifyInput(str, true, true))
+    {
+      cout << "X has to be of type double\n";
+      exit(ERROR_BAD_INPUT);
+    }
+    stringstream(str) >> this->xInicial[i];
+
+  }
+  
+  cout << "Enter the number of iterations" << endl;
+  getline (cin, str);
+  if (!VerifyInput(str, false))
+  {
+   cout << "Number of iteration has to be of type int\n";
+   exit(ERROR_BAD_INPUT);
+  }
+  stringstream(str) >> this->niter;
+  
+}
+
+InverseInterpolation::InverseInterpolation (double x1, double x2, double x3)
+{
+  string str;
+
+  this->xInicial.resize(3, 0);
+  this->xInicial[0] = x1;
+  this->xInicial[1] = x2;
+  this->xInicial[2] = x3;
+  sort(this->xInicial.begin(), this->xInicial.end());
+
+  cout << "Enter the number of iterations" << endl;
+  getline (cin, str);
+  if (!VerifyInput(str, false))
+  {
+   cout << "Number of iteration has to be of type int\n";
+   exit(ERROR_BAD_INPUT);
+  }
+  stringstream(str) >> this->niter;
+  
+}
+
+InverseInterpolation::InverseInterpolation (double x1, double x2, double x3, int niter)
+{
+  this->xInicial.resize(3, 0);
+  this->xInicial[0] = x1;
+  this->xInicial[1] = x2;
+  this->xInicial[2] = x3;
+  sort(this->xInicial.begin(), this->xInicial.end());
+  this->niter = niter;
+}
+
+double InverseInterpolation::LaGrange(vector <double> x)
+{
+  vector<double> y(3, 0);
+
+  y[0] = this->Function(x[0]);
+  y[1] = this->Function(x[1]);
+  y[2] = this->Function(x[2]);
+ 
+  return (y[1]*y[2]*x[0]) / ((y[0]-y[1]) * (y[0]-y[2])) +
+         (y[0]*y[2]*x[1]) / ((y[1]-y[0]) * (y[1]-y[2])) +
+         (y[0]*y[1]*x[2]) / ((y[2]-y[0]) * (y[2]-y[1]));
+}
+
+pair<int, double> InverseInterpolation::GetElementAndIndex(vector <double> x) 
+{
+  pair <int, double> result;
+  int count = 0;
+  int maxi = 0;
+  double max = 0;
+  double test;
+  for (auto const &aux : x)
+  {
+    if( (test = GetModule(this->Function(aux))) > max)
+    {
+      max = test;
+      maxi = count;
+    }
+    count++;
+  }
+
+  result = make_pair(maxi, max);
+  return result;
+}
+
+void InverseInterpolation::Solve()
+{
+  int k;
+  double auxNew, x0 = 10e36;
+  vector <double> x;
+  pair < int, double > indexValue;
+  
+  x = this->xInicial;
+
+  for (k = 1; k <= this->niter; k++)
+  {
+    auxNew = this->LaGrange(x);
+
+    if (GetModule(auxNew - x0) < this->tol)
+    {
+      cout << "Result : " << auxNew << endl;
+      return;
+    }
+    
+    indexValue = GetElementAndIndex(x);
+    x[indexValue.first] = auxNew;
+    sort(x.begin(), x.end(), [this](double& w1, double& w2){return (this->Function(w1) < this->Function(w2));});
+    x0 = auxNew;
+    cout << endl;
+  } 
+   
+}
+
 

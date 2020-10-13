@@ -19,10 +19,8 @@ int main ()
   a.Cross(result, b);
   result.PrintMatrix(); 
  */
-  ExOneNewton a(100, 1000, 0.0001);
-  cout << "f(100) : " << a.Function(100) << endl;
-  cout << "f'(100): " << a.Derivative(100) << endl;
-  a.SecantSolve();
+  ExOneII a(280, 290, 300, 100);
+  a.Solve();
   return 0;
 
 }

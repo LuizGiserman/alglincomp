@@ -361,3 +361,42 @@ void InverseInterpolation::Solve()
 }
 
 
+NonLinearEquations::NonLinearEquations(vector<double> firstSolution)
+{
+  this->firstSolution = firstSolution;
+}
+
+NLE_Newton::NLE_Newton(vector <double (*)(vector <double> )> listFunctions, vector<double> firstSolution) : NonLinearEquations(firstSolution) 
+{
+  this->listFunctions = listFunctions;
+}
+
+void NLE_Newton::Solve()
+{
+  BasicMatrix J;
+  int niter = 100;
+  int k;
+  vector<double> F;
+  vector<double> solutionX;
+  solutionX = this->firstSolution;
+  for (k = 0; k < niter; k++)
+  {
+    J = Jacobian (this->listFunctions, solutionX);
+    F = GetF(solutionX);
+    
+
+  }
+  
+}
+
+vector<double> NLE_Newton::GetF(vector<double> solutionX)
+{
+  int i = 0;
+  vector<double> result (this->listFunctions.size(), 0);
+  for (auto const &function: this->listFunctions)
+  {
+    result[i] = function(solutionX);
+  }
+
+  return result;
+}

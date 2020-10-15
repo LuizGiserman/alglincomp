@@ -10,9 +10,8 @@
 #include <math.h>
 #include <string>
 #include <algorithm>
-#include "basicMatrix.h"
 #include "linearEquation.h"
-
+#include "extraFunctions.h"
 #define ERROR_NO_SOLUTION     2
 
 class Bissection : public Utilities
@@ -116,9 +115,26 @@ class ExOneII : public InverseInterpolation
 
     double Function(double value) {return this->FunctionOne(value);};
 };
-// class Comparator : InverseInterpolation
-// {
-//   public:
-//   bool operator()(double x, double y) {return (this->Function(x) < this->Function(y));};
-// };
+
+class NonLinearEquations : public Utilities
+{
+  public:
+    NonLinearEquations(vector<double> firstSolution);
+    vector<double> firstSolution;
+};
+
+class NLE_Newton : public NonLinearEquations
+{
+  public:
+  NLE_Newton(vector <double (*)(vector <double> )> listFunctions, vector<double> firstSolution);
+  vector <double (*)(vector <double> )> listFunctions;
+  vector<double> GetF(vector<double> value);
+  void Solve();
+};
+
+class NLE_Broyden : public NonLinearEquations
+{
+  public:
+
+};
 

@@ -64,3 +64,6 @@ double Utilities::DerivativeTwo (double value)
 {
   return -2.0*(exp(2*value) + 2*sin(value));
 }
+
+
+

@@ -9,20 +9,22 @@
 
 #include <string>
 #include <math.h>
+#include <vector>
+#include "basicMatrix.h"
 
-using namespace std;
+using namespace std; 
 
 class Utilities 
 {
   public:
     Utilities() {};
 
-	  bool VerifyInput(string str, bool canBeNegative, bool isDouble=false);
-    double GetModule(double number);
-    double FunctionOne(double value);
-    double FunctionTwo(double value);
-    double DerivativeOne(double value);
-    double DerivativeTwo(double value);
+	  static bool VerifyInput(string str, bool canBeNegative, bool isDouble=false);
+    static double GetModule(double number);
+    static double FunctionOne(double value);
+    static double FunctionTwo(double value);
+    static double DerivativeOne(double value);
+    static double DerivativeTwo(double value);
 };
 
 

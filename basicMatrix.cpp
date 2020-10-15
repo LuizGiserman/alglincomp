@@ -22,7 +22,7 @@ bool BasicMatrix::SetMatrix()
 	{
     cout << "Enter the first dimension of the matrix\n";
     getline (cin, str);
-    if (!VerifyInput(str, false))
+    if (!Utilities::VerifyInput(str, false))
     {
       cout << "Dimension must be of type unsigned int\n";
       exit(ERROR_BAD_INPUT);
@@ -33,7 +33,7 @@ bool BasicMatrix::SetMatrix()
   {
     cout << "Enter the second dimension of the matrix\n";
     getline (cin, str);
-    if (!VerifyInput(str, false))
+    if (!Utilities::VerifyInput(str, false))
     {
       cout << "Dimension must be of type unsigned int\n";
       exit(ERROR_BAD_INPUT);
@@ -49,7 +49,7 @@ bool BasicMatrix::SetMatrix()
 			matrix[row].resize(this->n);
 			cout << "enter element matrix["<< row + 1 << "][" << column + 1 << "]: "; 
 			getline (cin, str);
-			if (!VerifyInput(str, true, true))
+			if (!Utilities::VerifyInput(str, true, true))
 			{
 				cout << "Element must be of type double\n";
 			  return false;
@@ -393,12 +393,12 @@ bool BasicMatrix::IsDiagonallyDominant()
     {
       if (j != i)
       {
-        sumLines += GetModule(this->matrix[i][j]);
-        sumColumns += GetModule(this->matrix[j][i]);
+        sumLines += Utilities::GetModule(this->matrix[i][j]);
+        sumColumns += Utilities::GetModule(this->matrix[j][i]);
       }
     }
   
-    if (GetModule(this->matrix[i][i]) < sumLines || GetModule(this->matrix[i][i]) < sumColumns)
+    if (Utilities::GetModule(this->matrix[i][i]) < sumLines || Utilities::GetModule(this->matrix[i][i]) < sumColumns)
     {
       return false;
     }
@@ -485,7 +485,7 @@ double BasicMatrix::PowerMethod (double threshold, BasicMatrix &eigenVector)
       }
     }
 
-    residue = GetModule(eigenValue - oldEigenValue) / GetModule (eigenValue);
+    residue = Utilities::GetModule(eigenValue - oldEigenValue) / Utilities::GetModule (eigenValue);
     cout << "iteration: " << iteration << endl;
     cout << "old eigenValue = " << oldEigenValue << endl;
     cout << "new eigenValue = " << eigenValue << endl; 
@@ -574,7 +574,7 @@ bool BasicMatrix::VerifyToleranceJacobi (double tolerance)
     {
       if (i!=j)
       {
-        if (GetModule(this->matrix[i][j]) > tolerance)
+        if (Utilities::GetModule(this->matrix[i][j]) > tolerance)
         {
           return true;
         }
@@ -596,9 +596,9 @@ pair<unsigned int, unsigned int> BasicMatrix::GetIndices ()
     {
       if (i!=j)
       {
-        if (GetModule(this->matrix[i][j]) > maxValue)
+        if (Utilities::GetModule(this->matrix[i][j]) > maxValue)
         {
-          maxValue = GetModule(this->matrix[i][j]);
+          maxValue = Utilities::GetModule(this->matrix[i][j]);
           indicesElement = make_pair((unsigned int) i, (unsigned int) j);
         }
       }

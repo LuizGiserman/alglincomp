@@ -21,7 +21,7 @@
 
 using namespace std;
 
-class BasicMatrix : public Utilities
+class BasicMatrix
 {
 	public:
 	BasicMatrix(unsigned int m=0, unsigned int n=0);

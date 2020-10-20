@@ -14,6 +14,34 @@ BasicMatrix::BasicMatrix (unsigned int n, unsigned int m)
 
 }
 
+BasicMatrix::BasicMatrix (vector<double> v)
+{
+  int i = 0;
+  this->m = v.size();
+  this->n = 1;
+  this->Allocate();
+  for (auto const &element: v)
+  {
+    this->matrix[i][0] = element;
+    i++;
+  } 
+}
+
+BasicMatrix::BasicMatrix(vector<vector<double>> v)
+{
+  int i = 0;
+  this->m = v.size();
+  this->n = v[0].size();
+  this->Allocate();
+  for (auto const &element: v)
+  {
+    this->matrix[i] = element;
+    i++;
+  }
+  
+}
+
+
 bool BasicMatrix::SetMatrix()
 {
   vector<vector<double>> matrix;
@@ -152,8 +180,16 @@ bool BasicMatrix::Add(BasicMatrix matrixB, BasicMatrix &result)
   {
     return false;
   }
-
-  result.Allocate();
+  if (result.m == 0 || result.n == 0)
+  {
+    result.m = this->m;
+    result.n = this->n;
+    result.Allocate();
+  }
+  if (result.matrix.empty())
+  {
+    result.Allocate();
+  }
   for (unsigned int i = 0; i < matrixB.m; i++)
   {
     for (unsigned int j = 0; j < matrixB.n; j++)
@@ -168,12 +204,16 @@ bool BasicMatrix::Add(BasicMatrix matrixB, BasicMatrix &result)
 
 bool BasicMatrix::Subtract(BasicMatrix matrixB, BasicMatrix &result)
 {
-  if (this->m != matrixB.m || this->n != matrixB.n)
+   if (result.m == 0 || result.n == 0)
   {
-    return false;
+    result.m = this->m;
+    result.n = this->n;
+  }
+  if (result.matrix.empty())
+  {
+    result.Allocate();
   }
 
-  result.Allocate();
   for (unsigned int i = 0; i < matrixB.m; i++)
   {
     for (unsigned int j = 0; j < matrixB.n; j++)
@@ -706,4 +746,87 @@ bool BasicMatrix::IsPositiveDefinite ()
   }
 
   return true;
+}
+
+void BasicMatrix::GetCofactor (BasicMatrix &temp, int p, int q)
+{
+  int i = 0, j = 0;
+  for (int row = 0; row < (int) this->m; row++)
+  {
+    for (int col = 0; col < (int) this->n; col++)
+    {
+      if (row != p && col != q)
+      {
+        temp.matrix[i][j++] = this->matrix[row][col];
+
+        if (j == (int) this->n-1)
+        {
+          j = 0;
+          i++;
+        }
+      }
+    }
+  }
+}
+
+void BasicMatrix::adjoint (BasicMatrix &adj)
+{
+  if (this->m==1)
+  {
+    adj.matrix[0][0] = 1;
+    return;
+  }
+
+  int sign =1;
+  BasicMatrix temp(this->m-1, this->n-1);
+  temp.Allocate();
+
+  for (int i=0; i < (int) this->m; i++)
+  {
+    for (int j=0; j< (int) this->n; j++)
+    {
+      this->GetCofactor(temp, i, j);
+
+      sign = ((i+j)%2==0)? 1: -1;
+
+      adj.matrix[j][i] = (sign)*(Determinant(temp));
+    }
+  }
+
+}
+
+bool BasicMatrix::Inverse(BasicMatrix &result)
+{
+  double det = this->Determinant((*this));
+  if (det == 0)
+  {
+    cout << "Matrix is Singular, can't Invert it" << endl;
+    return false;
+  } 
+  result.m = this->m;
+  result.n = this->n;
+  result.Allocate();
+  BasicMatrix adj (this->m, this->n);
+  adj.Allocate();
+  this->adjoint(adj);
+
+  for (int i=0; i < (int) this->m; i++)
+  {
+    for (int j=0; j < (int) this->n; j++)
+    {
+      result.matrix[i][j] = adj.matrix[i][j]/det;
+    }
+  }
+  return true;
+}
+
+void BasicMatrix::MultiplyByScalar(double scalar)
+{
+  for (int i=0; i < (int) this->m; i++)
+  {
+    for (int j=0; j < (int) this->n; j++)
+    {
+      this->matrix[i][j] *= scalar;
+    }
+  }
 }

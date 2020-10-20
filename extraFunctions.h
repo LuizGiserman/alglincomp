@@ -15,7 +15,7 @@
 using namespace std; 
 
 
-BasicMatrix Jacobian (vector <double (*)(vector <double> )> listFunctions, vector<double> firstSolution);
+void Jacobian (vector <double (*)(vector <double> )> listFunctions, BasicMatrix firstSolution, BasicMatrix &J);
 double PartialDerivative(double (*function)(vector<double>), vector<double> firstSolution, int index);
 double Derivative1D(double (*function)(double value), double value);
 

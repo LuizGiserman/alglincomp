@@ -119,22 +119,24 @@ class ExOneII : public InverseInterpolation
 class NonLinearEquations : public Utilities
 {
   public:
-    NonLinearEquations(vector<double> firstSolution);
-    vector<double> firstSolution;
+    NonLinearEquations(vector <double (*)(vector <double> )> listFunctions, vector<double> firstSolution);
+    BasicMatrix firstSolution;
+    vector <double (*)(vector <double> )> listFunctions;
+    void GetF(BasicMatrix values, BasicMatrix &result);
+    double tol = 0.0001;
 };
 
 class NLE_Newton : public NonLinearEquations
 {
   public:
-  NLE_Newton(vector <double (*)(vector <double> )> listFunctions, vector<double> firstSolution);
-  vector <double (*)(vector <double> )> listFunctions;
-  vector<double> GetF(vector<double> value);
+  NLE_Newton(vector <double (*)(vector <double> )> listFunctions, vector<double> firstSolution): NonLinearEquations(listFunctions, firstSolution){};
   void Solve();
 };
 
 class NLE_Broyden : public NonLinearEquations
 {
   public:
-
+  NLE_Broyden(vector <double (*)(vector <double> )> listFunctions, vector<double> firstSolution): NonLinearEquations(listFunctions, firstSolution){};
+  void Solve();
 };
 

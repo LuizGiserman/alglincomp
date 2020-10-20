@@ -361,42 +361,119 @@ void InverseInterpolation::Solve()
 }
 
 
-NonLinearEquations::NonLinearEquations(vector<double> firstSolution)
+NonLinearEquations::NonLinearEquations (vector <double (*)(vector <double> )> listFunctions, vector<double> firstSolution)
 {
-  this->firstSolution = firstSolution;
-}
-
-NLE_Newton::NLE_Newton(vector <double (*)(vector <double> )> listFunctions, vector<double> firstSolution) : NonLinearEquations(firstSolution) 
-{
+  BasicMatrix fs (firstSolution);
+  this->firstSolution = fs;
   this->listFunctions = listFunctions;
 }
 
 void NLE_Newton::Solve()
 {
-  BasicMatrix J;
+  BasicMatrix J, inverseJ, delta, F;
   int niter = 100;
   int k;
-  vector<double> F;
-  vector<double> solutionX;
+  double residue;
+  BasicMatrix solutionX, newX;
   solutionX = this->firstSolution;
+
   for (k = 0; k < niter; k++)
   {
-    J = Jacobian (this->listFunctions, solutionX);
-    F = GetF(solutionX);
-    
-
+    Jacobian (this->listFunctions, solutionX, J);
+    GetF(solutionX, F);
+    J.Inverse(inverseJ);
+    inverseJ.Cross(delta, F);
+    delta.MultiplyByScalar(-1);
+    solutionX.Add(delta, newX);
+    residue = delta.VectorNorm() / newX.VectorNorm();
+  
+    if (residue < this->tol)
+    {
+      cout << "Result : " << endl;
+      newX.PrintMatrix();
+      return;
+    }
+    J.Clear();
+    inverseJ.Clear();
+    delta.Clear();
+    solutionX = newX;
+    newX.Clear();
   }
   
 }
 
-vector<double> NLE_Newton::GetF(vector<double> solutionX)
+void NonLinearEquations::GetF(BasicMatrix solutionX, BasicMatrix &result)
 {
   int i = 0;
-  vector<double> result (this->listFunctions.size(), 0);
+  vector<double> solutionVector (solutionX.m, 0);
+  result.m =  this->listFunctions.size();
+  result.n = 1;
+  result.Allocate();
+ 
+  for (int j = 0; j < (int) solutionX.m; j++)
+  {
+    solutionVector[j] = solutionX.matrix[j][0];
+  }
+  
+
   for (auto const &function: this->listFunctions)
   {
-    result[i] = function(solutionX);
+    result.matrix[i][0] = function(solutionVector);
+    i++;
+  }
+}
+
+
+void NLE_Broyden::Solve()
+{
+  int niter = 100;
+  BasicMatrix b0, J, F, Fnew, solutionX, delta, inverseJ, newX, newB, Y, deltaT, aux, numerator, denominator, bn;
+  double residue;
+  b0.SetFromFile("startJacobian.txt");
+  solutionX = this->firstSolution;
+  
+  for (int k = 0; k < niter; k++)
+  {
+    J = b0;
+    J.Inverse(inverseJ);
+    GetF(solutionX, F);
+    inverseJ.Cross(delta, F);
+    delta.MultiplyByScalar(-1);
+    solutionX.Add(delta, newX);
+    GetF(newX, Fnew);
+    Fnew.Subtract(F, Y);
+    residue = delta.VectorNorm() / newX.VectorNorm();
+    cout << "residue : " << residue << endl;
+    if (residue < this->tol)
+    {
+      cout << "Result : " << endl;
+      newX.PrintMatrix();
+      return;
+    }
+    /*Finish this*/
+    delta.Transpose(deltaT);
+    b0.Cross(aux, delta);
+    aux.MultiplyByScalar(-1);
+    Y.Add(aux);
+    Y.Cross(numerator, deltaT);
+    delta.Cross(denominator, deltaT);
+    bn = b0;
+    for (int i=0; i < (int) b0.m; i++)
+    {
+      for(int j=0; j < (int) b0.n; j++)
+      {
+        bn.matrix[i][j] = numerator.matrix[i][j]/denominator.matrix[0][0]; 
+      }
+    }
+    b0.Add(bn);
+    bn.Clear();
+    Y.Clear();
+    F.Clear();
+    delta.Clear();
+    solutionX = newX;
+    newX.Clear();
+    Fnew.Clear();
+    inverseJ.Clear();
   }
 
-  return result;
 }

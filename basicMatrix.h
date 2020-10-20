@@ -25,6 +25,8 @@ class BasicMatrix
 {
 	public:
 	BasicMatrix(unsigned int m=0, unsigned int n=0);
+  BasicMatrix(vector<double> v);
+  BasicMatrix(vector<vector<double>> v);
 	vector<vector<double>> matrix;
 	unsigned int m, n;
 
@@ -51,10 +53,14 @@ class BasicMatrix
   bool MakeIdentity(unsigned int size);
   void Jacobi(double tolerance);
   bool IsPositiveDefinite();
+  bool Inverse(BasicMatrix &result);
+  void MultiplyByScalar(double scalar);
   private:
     pair<unsigned int, unsigned int> GetIndices ();
     bool VerifyToleranceJacobi(double tolerance);
     bool MakeP (pair <unsigned int, unsigned int> indicesElement, BasicMatrix &result);
+    void GetCofactor (BasicMatrix &temp, int p, int q);
+    void adjoint (BasicMatrix &adj);
 };
 
 #endif

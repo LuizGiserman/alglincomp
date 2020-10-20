@@ -60,6 +60,20 @@ LinearEquation::LinearEquation(bool empty)
   solution.resize(this->numberVariables, 0);
 }
 
+LinearEquation::LinearEquation(BasicMatrix a, BasicMatrix b)
+{
+  this->matrixA = a;
+  this->matrixB = b;
+  this->numberVariables = b.m;
+
+  if (this->matrixA.Determinant(this->matrixA) == 0)
+  {
+    cout << "No consistent solution to this problem\n";
+    exit(ERROR_NO_SOLUTION);
+  }
+
+}
+
 bool LinearEquation::ForwardSubstitution(BasicMatrix triangular, BasicMatrix b, BasicMatrix &result)
 {
   unsigned int i, j;
@@ -150,10 +164,6 @@ LU::LU(string s): LinearEquation(s)
   this->Decompose();
 }
 
-LU::LU (bool empty) : LinearEquation(empty)
-{
-}
-
 void LU::Check()
 {
   if (this->matrixA.m != this->matrixA.n)
@@ -221,8 +231,10 @@ bool LU::Solve()
     cout << "x[" << i << "] = " << solution[i] << " ";
   }
 
+  this->solutionMatrix = backwardsResult;
   return true;
 }
+
 
 void LU::MakeL (BasicMatrix &L)
 {

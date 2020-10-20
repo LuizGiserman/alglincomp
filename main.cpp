@@ -16,18 +16,20 @@ double function2 (vector<double> x)
 int main ()
 {
 
-  vector <double> first = {2, 3};
+  // vector <double> first = {2, 3};
 
-  vector <double (*)(vector <double> )> funcs;
-  funcs.push_back(function1);
-  funcs.push_back(function2);
-  cout << "pushed back" << endl;
-  // NLE_Newton teste(funcs, first);
-  // cout << "Created Object" << endl;
-  // teste.firstSolution.PrintMatrix();
+  // vector <double (*)(vector <double> )> funcs;
+  // funcs.push_back(function1);
+  // funcs.push_back(function2);
+  // cout << "pushed back" << endl;
+  // // NLE_Newton teste(funcs, first);
+  // // cout << "Created Object" << endl;
+  // // teste.firstSolution.PrintMatrix();
+  // // teste.Solve();
+  // NLE_Broyden teste (funcs, first);
   // teste.Solve();
-  NLE_Broyden teste (funcs, first);
-  teste.Solve();
-  return 0;
+  // return 0;
+
+  
 
 }

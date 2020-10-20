@@ -18,10 +18,12 @@ class LinearEquation : public Utilities
   public:
     LinearEquation(string s="");
     LinearEquation(bool empty);
+    LinearEquation(BasicMatrix a, BasicMatrix b);
     virtual ~LinearEquation() { };
-    BasicMatrix matrixA, matrixB;
+    BasicMatrix matrixA, matrixB, solutionMatrix;
     unsigned int numberVariables;
     vector<double> solution;
+
 
     virtual bool Solve() {return true;};
     bool ForwardSubstitution(BasicMatrix triangular, BasicMatrix b, BasicMatrix &result);
@@ -50,7 +52,8 @@ class LU : public LinearEquation
 {
   public:
     LU(string s="");
-    LU(bool empty);
+    LU(bool empty) : LinearEquation(empty) {};
+    LU(BasicMatrix a, BasicMatrix b) : LinearEquation (a, b) {};
     BasicMatrix matrixLU;
     bool Decompose();
     void Check();

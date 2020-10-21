@@ -79,4 +79,11 @@ class IntegralPolinomial : public Integral
     double Integration();
 };
 
+class IntegralQuadr : public Integral
+{
+    public:
+    IntegralQuadr(double (*function)(vector<double>), double a, double b, int numberPoints) : Integral (function, a, b, numberPoints) {};
+    double Integration();
+};
+
 #endif

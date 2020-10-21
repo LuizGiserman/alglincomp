@@ -2,7 +2,7 @@
 #include "linearEquation.h"
 #include "mmse.h"
 #include "nonLinearSolutions.h"
-
+#include "integrals.h"
 
 double function1 (vector<double> x)
 {
@@ -13,6 +13,12 @@ double function2 (vector<double> x)
 {
   return x[0]*x[0] + 4 * x[1] * x[1] -4;  
 }
+
+double function3 (vector<double>x)
+{
+  return exp(-pow(x[0], 2)/2)/sqrt(2 * PI);
+}
+
 int main ()
 {
 
@@ -30,6 +36,8 @@ int main ()
   // teste.Solve();
   // return 0;
 
-  
+  IntegralPolinomial teste (function3, -INF, 1, 10);
+  cout << "Result : " << teste.Integrate() << endl;
+  return 0;
 
 }

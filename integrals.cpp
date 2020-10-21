@@ -41,7 +41,9 @@ double Integral::Integrate()
         hermiteSum += this->HermiteFunction(vector<double>{pointsHermite[i]}) * weightHermite[i];
         laguerreSum += this->LaguerreFunction(vector<double>{pointsLaguerre[i]}) * weightsLaguerre[i];
     }
-
+    cout << "HermiteSum : " << hermiteSum << endl;
+    cout << "LaguerreSum : " << laguerreSum << endl;
+    
     if (this->a == -INF)
     {
         if (this->b == INF)
@@ -119,11 +121,29 @@ double IntegralPolinomial::Integration()
     }
     LU vLU(vandermont, matrixB);
     vLU.Solve();
-    
     for (i = 0; i < this->numberPoints; i++)
     {
         result += vLU.solution[i] * this->function(vector<double>{incognitos[i]});
     }
     
     return result;
+}
+
+double IntegralQuadr::Integration()
+{
+    int i;
+    vector<double> pointsLegendre, weightsLegendre, incognitos;
+    pointsLegendre = LEGENDRE[this->numberPoints-2].first;
+    weightsLegendre = LEGENDRE[this->numberPoints-2].second;
+    double L = this->b - this->a;
+    double integralSum = 0;
+    incognitos.reserve(this->numberPoints);
+    
+    for (i=0; i < this->numberPoints; i++)
+    {
+        incognitos.push_back( (this->a + this->b + pointsLegendre[i] * L) / 2);
+        integralSum += function(vector<double>{incognitos[i]}) * weightsLegendre[i];
+    }
+
+    return integralSum * L / 2;
 }

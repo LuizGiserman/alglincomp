@@ -72,6 +72,7 @@ LinearEquation::LinearEquation(BasicMatrix a, BasicMatrix b)
     exit(ERROR_NO_SOLUTION);
   }
 
+  solution.resize(this->numberVariables);
 }
 
 bool LinearEquation::ForwardSubstitution(BasicMatrix triangular, BasicMatrix b, BasicMatrix &result)
@@ -213,22 +214,25 @@ bool LU::Solve()
   MakeL(L);
   MakeU(U); 
 
-  cout << "L: \n";
-  L.PrintMatrix();
-  cout << "U: \n";
-  U.PrintMatrix();
+  // cout << "L: \n";
+  // L.PrintMatrix();
+  // cout << "U: \n";
+  // U.PrintMatrix();
   if(!this->ForwardSubstitution(L, this->matrixB, forwardResult))
   {
     return false;
+    cout << "False 1";
   }
   if(!this->BackwardsSubstitution(U, forwardResult, backwardsResult))
   {
     return false;
+    cout << "False 2";
   }
+
   for (unsigned i = 0; i < backwardsResult.m; i++)
   {
     this->solution[i] = backwardsResult.matrix[i][0];
-    cout << "x[" << i << "] = " << solution[i] << " ";
+    // cout << "x[" << i << "] = " << solution[i] << " ";
   }
 
   this->solutionMatrix = backwardsResult;

@@ -53,7 +53,7 @@ class LU : public LinearEquation
   public:
     LU(string s="");
     LU(bool empty) : LinearEquation(empty) {};
-    LU(BasicMatrix a, BasicMatrix b) : LinearEquation (a, b) {};
+    LU(BasicMatrix a, BasicMatrix b) : LinearEquation (a, b) {this->Check();};
     BasicMatrix matrixLU;
     bool Decompose();
     void Check();

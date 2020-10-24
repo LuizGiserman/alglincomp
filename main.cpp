@@ -3,6 +3,7 @@
 #include "mmse.h"
 #include "nonLinearSolutions.h"
 #include "integrals.h"
+#include "differentialEquations.h"
 
 double function1 (vector<double> x)
 {
@@ -19,6 +20,16 @@ double function3 (vector<double>x)
   return exp(-pow(x[0], 2)/2)/sqrt(2 * PI);
 }
 
+double diffFunc (vector<double> t, vector<double> x)
+{
+  // return -2*t[0]*(pow(x[0],2));
+  return t[0] + x[0];
+}
+
+double SO_diffFunc (vector<double> t, vector<double> x, double aux)
+{
+  return -9.807 - aux * Utilities::GetModule(aux);
+}
 int main ()
 {
 
@@ -36,8 +47,13 @@ int main ()
   // teste.Solve();
   // return 0;
 
-  IntegralPolinomial teste (function3, -INF, 1, 10);
-  cout << "Result : " << teste.Integrate() << endl;
-  return 0;
+  // IntegralPolinomial teste (function3, -INF, 1, 10);
+  // cout << "Result : " << teste.Integrate() << endl;
+  // return 0;
 
+  EDO_RK_Nystrom teste(SO_diffFunc, 0, 1.0, 0.0, 0.0, 0.1);
+  teste.Solve();
 }
+
+
+
